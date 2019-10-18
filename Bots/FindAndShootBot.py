@@ -7,6 +7,7 @@ import binascii
 import struct
 import argparse
 import random
+import math
 
 
 class ServerMessageTypes(object):
@@ -169,6 +170,14 @@ if args.debug:
 else:
 	logging.basicConfig(format='[%(asctime)s] %(message)s', level=logging.INFO)
 
+
+def turnTurretToFaceTarget(x_target, y_target, x_tank, y_tank):
+	turn_angle = math.atan2(y_target - y_tank, x_target - x_tank)
+	GameServer.sendMessage(ServerMessageTypes.TURNTURRETTOHEADING, {"Amount": turn_angle})
+
+def turnTankToFaceTarget(x_target, y_target, x_tank, y_tank):
+	turn_angle = math.atan2(y_target - y_tank, x_target - x_tank)
+	GameServer.sendMessage(ServerMessageTypes.TURNTOHEADING, {"Amount": turn_angle})
 
 # Connect to game server
 GameServer = ServerComms(args.hostname, args.port)
