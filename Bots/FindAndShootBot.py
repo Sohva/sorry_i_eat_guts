@@ -181,10 +181,15 @@ GameServer.sendMessage(ServerMessageTypes.CREATETANK, {'Name': "TeamB:SBot"})
 i=0
 while True:
         message = GameServer.readMessage()
-        
+
+        if 'Time' in message:
+                continue
         print(message)
         #GameServer.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {'Amount': random.randint(0, 10)})
-        
+        if message['Name'] == "TeamB:SBot":
+                logging.info("my X position is: %d"% message['X'])
+                logging.info("my Y position is: %d"% message['Y'])
+                logging.info("my heading is: %d"% message['Heading'])
         if message['Name'] == "ManualTank":
                 logging.info("Found target")
                 turnTurretToFaceTarget(message["X"], message["Y"])
