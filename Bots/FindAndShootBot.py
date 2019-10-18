@@ -174,17 +174,24 @@ else:
 GameServer = ServerComms(args.hostname, args.port)
 
 # Spawn our tank
-logging.info("Creating tank with name '{}'".format(args.name))
-GameServer.sendMessage(ServerMessageTypes.CREATETANK, {'Name': args.name})
+logging.info("Creating tank with name '{}'".format("TeamB:SBot"))
+GameServer.sendMessage(ServerMessageTypes.CREATETANK, {'Name': "TeamB:SBot"})
 
 # Main loop - read game messages, ignore them and randomly perform actions
 i=0
 while True:
         message = GameServer.readMessage()
+        
         print(message)
-        GameServer.sendMessage(ServerMessageTypes.TEST)
-        if message['Name'] == ""
-                logging.info("Moving randomly")
-                GameServer.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {'Amount': random.randint(0, 10)})
+        #GameServer.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {'Amount': random.randint(0, 10)})
+        
+        if message['Name'] == "ManualTank":
+                logging.info("Found target")
+                turnTurretToFaceTarget(message["X"], message["Y"])
+                logging.info("Firing")
+                GameServer.sendMessage(ServerMessageTypes.FIRE)
+
+
+                
 
 
