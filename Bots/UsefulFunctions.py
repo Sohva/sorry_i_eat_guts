@@ -304,23 +304,36 @@ def distanceTo(loc1, loc2):
     return ((loc1[0] - loc2[0]) ** 2 + (loc1[1] - loc2[1]) ** 2) ** (0.5)
 
 def shoot_with_predictive_aiming(tank, target, server):
+	# shoot_with_predictive_aiming(tank.ids_to_messages[tank.id], tank.ids_to_messages[closest_enemy[2]], tank.server)
 	print("shooting with predictive aiming")
 	shoot_angle = getShotHeading(tank, target)
 	print("angle to shoot at is ", shoot_angle)
 	server.sendMessage(ServerMessageTypes.TURNTURRETTOHEADING, {'Amount': shoot_angle})
 	server.sendMessage(ServerMessageTypes.FIRE)
 
+
 def zigzag(tank, server):
-	for i in range(0,100):
+	for i in range(0,3000):
 		print()
 		print(i)
 		print()
 		heading = float(tank['Heading'])
 		if i == 0:
-			server.sendMessage(ServerMessageTypes.TURNTOHEADING(heading + 30))
-		elif i == 25:
-			server.sendMessage(ServerMessageTypes.TURNTOHEADING(heading - 60))
-		elif i == 75:
-			server.sendMessage(ServerMessageTypes.TURNTOHEADING(heading + 60))
-		elif i == 99:
-			server.sendMessage(ServerMessageTypes.TURNTOHEADING(heading - 30))
+			print("TURNING\n\n")
+			server.sendMessage(ServerMessageTypes.TURNTOHEADING,
+			                   {'Amount': heading + 30})
+		elif i == 1000:
+			print("TURNING\n\n")
+			server.sendMessage(ServerMessageTypes.TURNTOHEADING,
+			                   {'Amount': heading - 60})
+		elif i == 2000:
+			print("TURNING\n\n")
+			server.sendMessage(ServerMessageTypes.TURNTOHEADING,
+			                   {'Amount': heading + 60})
+		elif i == 2999:
+			print("TURNING\n\n")
+			server.sendMessage(ServerMessageTypes.TURNTOHEADING,
+			                   {'Amount': heading - 30})
+
+def shoot(server):
+	server.sendMessage(ServerMessageTypes.FIRE)
