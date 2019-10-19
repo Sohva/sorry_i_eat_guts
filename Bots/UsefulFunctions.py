@@ -258,7 +258,7 @@ def findClosestEnemy(our_tanks, location, our_team):
 	return result
 
 def getShotHeading(tank, target):
-	time_interval = 0.01
+	time_interval = 0.1
 	tank_pos = (tank['X'], tank['Y'])
 	target_pos_init = (target['X'], target['Y'])
 	#tank_v = getVelocity(tank, (tank['X'], tank['Y']), time_interval)
@@ -323,7 +323,49 @@ def shoot_with_predictive_aiming(tank, target, server):
 	server.sendMessage(ServerMessageTypes.TURNTURRETTOHEADING, {'Amount': shoot_angle})
 	server.sendMessage(ServerMessageTypes.FIRE)
 
+
+def zigzag(tank, server):
+	for i in range(0,3000):
+		print()
+		print(i)
+		print()
+		heading = float(tank['Heading'])
+		if i == 0:
+			print("TURNING\n\n")
+			server.sendMessage(ServerMessageTypes.TURNTOHEADING,
+			                   {'Amount': heading + 30})
+		elif i == 1000:
+			print("TURNING\n\n")
+			server.sendMessage(ServerMessageTypes.TURNTOHEADING,
+			                   {'Amount': heading - 60})
+		elif i == 2000:
+			print("TURNING\n\n")
+			server.sendMessage(ServerMessageTypes.TURNTOHEADING,
+			                   {'Amount': heading + 60})
+		elif i == 2999:
+			print("TURNING\n\n")
+			server.sendMessage(ServerMessageTypes.TURNTOHEADING,
+			                   {'Amount': heading - 30})
+
 def shoot(server):
 	server.sendMessage(ServerMessageTypes.FIRE)
 
+def closestToSnitch(objects, tank):
+	snitch_pos = Null
+	for object in objects.ids_to_messages.values():
+		if object['Name'] == "Snitch":
+			snitch_pos = (object['X'], object['Y'])
 
+	if snitch_pos == Null:
+		return None
+
+	closest_distance = sqrt((tank.info['X'] - snitch_pos[0]) ** 2 +
+			                (tank.info['Y'] - snitch_pos[1]) ** 2)
+	this_tank_closest = True
+	for object in objects:
+		if object.info['Id'] != tank.info['Id'] and object.info['Type'] == "Tank":
+			if sqrt((tank.info['X'] - object.info['X']) ** 2 +
+			        (tank.info['Y'] - object.info['Y']) ** 2) < closest_distance:
+				this_tank_closest = False
+
+	return this_tank_closest
