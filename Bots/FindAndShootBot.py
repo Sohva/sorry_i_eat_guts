@@ -8,6 +8,7 @@ import struct
 import argparse
 import random
 import math
+import datetime
 
 
 class ServerMessageTypes(object):
@@ -195,6 +196,8 @@ GameServer = ServerComms(args.hostname, args.port)
 myName = "TeamB:SBot"
 myXCoord = 0
 myYCoord = 0
+allowedTurn = True
+lastTurnTime = None
 logging.info("Creating tank with name '{}'".format("TeamB:SBot"))
 GameServer.sendMessage(ServerMessageTypes.CREATETANK, {'Name': myName})
 
@@ -218,7 +221,9 @@ while True:
 
 	if message['Name'] == "ManualTank":
 		logging.info("Found target")
-		turnTurretToFaceTarget(myXCoord, myYCoord, message["X"], message["Y"])
+		if datetime.datetime.now() - lastTurnTime < 1:
+			turnTurretToFaceTarget(myXCoord, myYCoord, message["X"], message["Y"])
+			lastTurnTime = datetime.datetime.now()
 		logging.info("Firing")
 		GameServer.sendMessage(ServerMessageTypes.FIRE)
 
