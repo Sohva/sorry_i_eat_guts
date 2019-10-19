@@ -218,3 +218,14 @@ def goToGoal(x_tank, y_tank, server):
 		moveToPoint(x_tank, y_tank, 0, 100, server)
 	else:
 		moveToPoint(x_tank, y_tank, 0, -100, server)
+
+def findClosestEnemy(tanks, location, our_team):
+	closest_distance = math.inf
+	closest_location = None
+	for tank in tanks:
+		if tank["Name"].split(":")[0] != our_team:
+			distance = sqrt((location[0] - tank['X'])**2 + (location[1] - tank['Y'])**2)
+			if distance < closest_distance:
+				closest_distance = distance
+				closest_location = (tank['X'],tank['Y'])
+	return closest_location
