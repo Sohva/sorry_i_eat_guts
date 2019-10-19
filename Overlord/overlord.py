@@ -1,4 +1,5 @@
-#!/usr/bin/python
+import threading
+import argparse
 
 import json
 import socket
@@ -7,10 +8,6 @@ import binascii
 import struct
 import argparse
 import random
-import math
-
-import time
-
 
 
 class ServerMessageTypes(object):
@@ -81,7 +78,6 @@ class ServerMessageTypes(object):
 			return self.strings[id]
 		else:
 			return "??UNKNOWN??"
-
 
 class ServerComms(object):
 	'''
@@ -159,106 +155,19 @@ class ServerComms(object):
 		return self.ServerSocket.send(message)
 
 
-# Parse command line args
-parser = argparse.ArgumentParser()
-parser.add_argument('-d', '--debug', action='store_true', help='Enable debug output')
-parser.add_argument('-H', '--hostname', default='127.0.0.1', help='Hostname to connect to')
-parser.add_argument('-p', '--port', default=8052, type=int, help='Port to connect to')
-parser.add_argument('-n', '--name', default='TeamA:RandomBot', help='Name of bot')
-args = parser.parse_args()
+def tellMeThePort(idw, default_port=8052):
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p', '--port', default=default_port, type=int, help='Port to connect to')
+    args = parser.parse_args()
 
-# Set up console logging
-if args.debug:
-	logging.basicConfig(format='[%(asctime)s] %(message)s', level=logging.DEBUG)
-else:
-	logging.basicConfig(format='[%(asctime)s] %(message)s', level=logging.INFO)
+    print(idw + " " + str(args))
 
+def makeMeServer(hostname="localhost",port=8052):
+    GameServer = ServerComms(hostname, port)
+    print("Creating tank with name '{}'".format(port))
+    GameServer.sendMessage(ServerMessageTypes.CREATETANK, {'Name': port})
 
-def turnTurretToFaceTarget(x_tank, y_tank, x_target, y_target):
-	x_diff = x_target - x_tank
-	y_diff = y_target - y_tank
-
-	if x_diff >= 0:
-		if y_diff >= 0:
-			turn_angle = 360 - (math.atan2(y_diff, x_diff) * 360 / (2 * math.pi))
-		else:
-			turn_angle = -math.atan2(y_diff, x_diff) * 360 / (2 * math.pi)
-	else:
-		if y_diff >= 0:
-			turn_angle = 360 - (math.atan2(y_diff, x_diff) * 360 / (2 * math.pi))
-		else:
-			turn_angle = -math.atan2(y_diff, x_diff) * 360 / (2 * math.pi)
-
-	GameServer.sendMessage(ServerMessageTypes.TURNTURRETTOHEADING, {"Amount": turn_angle})
-
-
-def turnTankToFaceTarget(x_tank, y_tank, x_target, y_target):
-	x_diff = x_target - x_tank
-	y_diff = y_target - y_tank
-
-	if x_diff >= 0:
-		if y_diff >= 0:
-			turn_angle = 360 - (math.atan2(y_diff, x_diff) * 360 / (2 * math.pi))
-		else:
-			turn_angle = -math.atan2(y_diff, x_diff) * 360 / (2 * math.pi)
-	else:
-		if y_diff >= 0:
-			turn_angle = 360 - (math.atan2(y_diff, x_diff) * 360 / (2 * math.pi))
-		else:
-			turn_angle = -math.atan2(y_diff, x_diff) * 360 / (2 * math.pi)
-
-	GameServer.sendMessage(ServerMessageTypes.TURNTOHEADING, {"Amount": turn_angle})
-
-
-def moveToPoint(x_tank, y_tank, x_target, y_target):
-	turnTankToFaceTarget(x_tank, y_tank, x_target, y_target)
-	distance = math.sqrt(math.pow(x_target - x_tank, 2) + math.pow(y_target - y_tank, 2))
-	GameServer.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {'Amount': distance})
-
-
-# Connect to game server
-GameServer = ServerComms(args.hostname, args.port)
-
-# Spawn our tank
-myName = "TeamB:SBot"
-myXCoord = 0
-myYCoord = 0
-allowedTurn = True
-lastTurnTime = None
-logging.info("Creating tank with name '{}'".format("TeamB:SBot"))
-GameServer.sendMessage(ServerMessageTypes.CREATETANK, {'Name': myName})
-
-print("today seconds is ", time.time())
-
-lastTurnTime = time.time()
-# Main loop
-while True:
-	message = GameServer.readMessage()
-	print(message)
-
-	# GameServer.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {"Amount": 90})
-	# GameServer.sendMessage(ServerMessageTypes.MOVEBACKWARSDISTANCE, {"Amount": 90})
-	# GameServer.sendMessage(ServerMessageTypes.TURNTURRETTOHEADING, {"Amount": 90})
-	# GameServer.sendMessage(ServerMessageTypes.TURNTOHEADING, {"Amount": 100})
-	# GameServer.sendMessage(ServerMessageTypes.FIRE)
-
-	if 'Name' not in message:
-		continue
-
-	if message['Name'] == myName:
-		myXCoord = message['X']
-		myYCoord = message['Y']
-		logging.info("my X position is: %d"% message['X'])
-		logging.info("my Y position is: %d"% message['Y'])
-		logging.info("my heading is: %d"% message['Heading'])
-		logging.info("my turret heading is: %d" % message['TurretHeading'])
-
-	if message['Name'] == "ManualTank":
-		logging.info("Found target")
-		turnTurretToFaceTarget(myXCoord, myYCoord, message["X"], message["Y"])
-		moveToPoint(myXCoord, myYCoord, message["X"], message["Y"])
-		logging.info("Firing")
-		GameServer.sendMessage(ServerMessageTypes.FIRE)
-
-
-
+thread1 = threading.Thread(target=makeMeServer, kwargs={'port': 8052})
+thread2 = threading.Thread(target=makeMeServer, kwargs={'port': 8052})
+thread1.start()
+thread2.start()
