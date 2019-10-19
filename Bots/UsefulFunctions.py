@@ -278,3 +278,6 @@ def moveRandomly(server):
 def turnRandomly(server):
 	logging.info("Turning randomly")
 	server.sendMessage(ServerMessageTypes.TURNTOHEADING, {'Amount': random.randint(0, 359)})
+
+def distanceTo(loc1, loc2):
+    return ((loc1[0] - loc2[0]) ** 2 + (loc1[1] - loc2[1]) ** 2) ** (0.5)

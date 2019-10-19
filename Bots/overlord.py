@@ -27,6 +27,7 @@ class ThreadingTank(threading.Thread):
         self.nb_kills_to_bank = 0
         self.ammo = 0
         self.isSeeker = False
+        self.hasSnitch = False
         logging.info("Creating tank with name '{}'".format(name))
 
     """
@@ -56,6 +57,9 @@ class ThreadingTank(threading.Thread):
         if message["messageType"] == 25:
             global snitch_appeared
             snitch_appeared = True
+        if (message["messageType"] == 21) && (message["Id"] == self.id):
+            self.hasSnitch = True
+
 
     def run(self):
         self.server.sendMessage(ServerMessageTypes.CREATETANK, {'Name': self.name, })
@@ -67,26 +71,29 @@ class ThreadingTank(threading.Thread):
         return
 
 
-def distanceTo(loc1, loc2):
-    return ((loc1[0] - loc2[0]) ** 2 + (loc1[1] - loc2[1]) ** 2) ** (0.5)
-
-
 snitch_appeared = False
 
 if __name__ == "__main__":
     logging.basicConfig(format='[%(asctime)s] %(message)s', level=logging.INFO)
 
+    nb_tanks_to_spawn = 1
     TEAM = "TeamA"
     tanks = []
     shoot_range = 50
     # Initialise tanks
-    for i in range(1):
+    for i in range(nb_tanks_to_spawn):
         tanks.append(ThreadingTank(TEAM + ":{}".format(i)))
         tanks[i].start()
 
     # Smash them
     while 5 - 3 + 2 == 4:
         for tank in tanks:
+            if tank.hasSnitch:
+                goToGoal(tank.location[0], tank.location[1], tank.server)
+                continue
+            elif tank.isSeeker:
+                goToSnitch(tanks, tank.server)
+                continue
             if tank.nb_kills_to_bank > 0:
                 print("killed someone")
                 goToGoal(tank.location[0], tank.location[1], tank.server)
@@ -95,8 +102,10 @@ if __name__ == "__main__":
 
                 if snitch_appeared:
                     print("snitch appeared")
-                    #if thereIsASeeker(tanks):
-                    pass
+                    if thereIsASeeker(tanks):
+                        pass
+                    else:
+                        tank.isSeeker = True
                 else:
                     print("snitch not appeared")
                     if tank.ammo > 0:
