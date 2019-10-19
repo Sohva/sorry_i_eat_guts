@@ -125,7 +125,7 @@ if __name__ == "__main__":
                                                    closest_enemy[1],
                                                    tank.server)
                             print("shooting now")
-                            shoot_with_predictive_aiming(tank.ids_to_messages[tank.id], tank.ids_to_messages[closest_enemy[2]], tank.server)
+                            shoot(tank.server)
                         else:
                             print("closest enemy out of range")
                             moveToPoint(tank.location[0],

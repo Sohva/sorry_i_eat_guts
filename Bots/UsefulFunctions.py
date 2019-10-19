@@ -304,10 +304,14 @@ def distanceTo(loc1, loc2):
     return ((loc1[0] - loc2[0]) ** 2 + (loc1[1] - loc2[1]) ** 2) ** (0.5)
 
 def shoot_with_predictive_aiming(tank, target, server):
+	# shoot_with_predictive_aiming(tank.ids_to_messages[tank.id], tank.ids_to_messages[closest_enemy[2]], tank.server)
 	print("shooting with predictive aiming")
 	shoot_angle = getShotHeading(tank, target)
 	print("angle to shoot at is ", shoot_angle)
 	server.sendMessage(ServerMessageTypes.TURNTURRETTOHEADING, {'Amount': shoot_angle})
+	server.sendMessage(ServerMessageTypes.FIRE)
+
+def shoot(server):
 	server.sendMessage(ServerMessageTypes.FIRE)
 
 
