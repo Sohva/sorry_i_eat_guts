@@ -246,10 +246,7 @@ def findClosestEnemy(our_tanks, location, our_team):
 	return closest_location
 
 
-def predictiveAiming(location, server):
-	return True
-
-def getShotHeading(tank, target, server):
+def getShotHeading(tank, target):
 
 	time_interval = 0.1
 	tank_pos = (0,0)
@@ -298,4 +295,10 @@ def turnRandomly(server):
 
 def distanceTo(loc1, loc2):
     return ((loc1[0] - loc2[0]) ** 2 + (loc1[1] - loc2[1]) ** 2) ** (0.5)
+
+def shoot_with_predictive_aiming(tank, target, server):
+	turn_angle = getShotHeading(tank, target)
+	server.sendMessage(ServerMessageTypes.TURNTURRETTOHEADING, {'Amount': turn_angle})
+	server.sendMessage(ServerMessageTypes.FIRE)
+
 
