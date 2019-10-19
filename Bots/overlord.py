@@ -60,13 +60,15 @@ class ThreadingTank(threading.Thread):
 			print(self.items_to_ids)
 		return
         
-
+def distance2(loc1, loc2):
+        return ((loc1[0] - loc2[0])**2 + (loc1[1] - loc2[1])**2)**(0.5)
 	
 if __name__ == "__main__":
 	logging.basicConfig(format='[%(asctime)s] %(message)s', level=logging.INFO)	
 	
 	TEAM = "TeamA"
 	tanks = []
+	shoot_range = 50
 	# Initialise tanks
 	for i in range(4):
 		tanks.append(ThreadingTank(TEAM+":{}".format(i)))
@@ -84,7 +86,21 @@ if __name__ == "__main__":
                                 else:
                                         # TODO(do we have ammo)
                                         if True:
-                                                turnTurret
+                                                closest_enemy = FindClosestEnemy(tank.location)
+                                                if distance2(tank.location, closest_enemy) < shoot_range:
+                                                        turnTurretToFaceTarget(tank.location[0],
+                                                                               tank.location[1],
+                                                                               closest_enemy[0],
+                                                                               closest_enemy[1],
+                                                                               tank.server)
+                                                        tank.server.sendMessage(ServerMessageTypes.FIRE)
+                                                else:
+                                                        moveToPoint(tank.location[0],
+                                                                    tank.location[1],
+                                                                    closest_enemy[0],
+                                                                    closest_enemy[1],
+                                                                    tank.server)
+                                                        
                                         else:
                                                 pass
                                                 
