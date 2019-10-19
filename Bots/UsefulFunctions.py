@@ -252,8 +252,8 @@ def getShotHeading(tank, target):
 	#tank_v = getVelocity(tank, (tank['X'], tank['Y']), time_interval)
 	target_v = getVelocity(target, target_pos_init, time_interval)
 
-	y_diff = (target_pos[1] + target_v[1] * time_interval) - tank_pos[1]
-	x_diff = (target_pos[0] + target_v[0] * time_interval) - tank_pos[0]
+	y_diff = (target_pos_init[1] + target_v[1] * time_interval) - tank_pos[1]
+	x_diff = (target_pos_init[0] + target_v[0] * time_interval) - tank_pos[0]
 
 	if x_diff >= 0:
 		if y_diff >= 0:
@@ -272,7 +272,7 @@ def getVelocity(tank, init_position, time_interval):
 	time.sleep(time_interval)
 	vx = (tank['X'] - init_position[0]) / time_interval
 	vy = (tank['Y'] - init_position[0]) / time_interval
-	return tuple(vx,vy)
+	return tuple((vx,vy))
 
 def moveRandomly(server):
 	logging.info("Turning randomly")
