@@ -8,7 +8,9 @@ import struct
 import argparse
 import random
 import math
-import datetime as dt
+
+import time
+
 
 
 class ServerMessageTypes(object):
@@ -218,7 +220,6 @@ def moveToPoint(x_tank, y_tank, x_target, y_target):
 GameServer = ServerComms(args.hostname, args.port)
 
 # Spawn our tank
-
 myName = "TeamB:SBot"
 myXCoord = 0
 myYCoord = 0
@@ -227,6 +228,9 @@ lastTurnTime = None
 logging.info("Creating tank with name '{}'".format("TeamB:SBot"))
 GameServer.sendMessage(ServerMessageTypes.CREATETANK, {'Name': myName})
 
+print("today seconds is ", time.time())
+
+lastTurnTime = time.time()
 # Main loop
 while True:
 	message = GameServer.readMessage()
@@ -234,7 +238,6 @@ while True:
 
 	# GameServer.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {"Amount": 90})
 	# GameServer.sendMessage(ServerMessageTypes.MOVEBACKWARSDISTANCE, {"Amount": 90})
-	#
 	# GameServer.sendMessage(ServerMessageTypes.TURNTURRETTOHEADING, {"Amount": 90})
 	# GameServer.sendMessage(ServerMessageTypes.TURNTOHEADING, {"Amount": 100})
 	# GameServer.sendMessage(ServerMessageTypes.FIRE)
