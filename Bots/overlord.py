@@ -2,6 +2,7 @@
 
 from ServerMessageTypes import ServerMessageTypes
 from ServerComms import ServerComms
+from UsefulFunctions import *
 import threading
 import time
 import logging
@@ -11,7 +12,8 @@ class ThreadingTank(threading.Thread):
 	def __init__(self, name, port=8052, hostname='127.0.0.1'):
 		threading.Thread.__init__(self)
 		self.ids_to_messages = {}
-		self.items_to_ids = {
+		self.items_to_ids =
+		{
                 "Tank":[], 
 		"HealthPickup": [], 
 		"AmmoPickup": [],
@@ -20,6 +22,8 @@ class ThreadingTank(threading.Thread):
 		self.status = {}
 		self.server = ServerComms(hostname, port)
 		self.name = name
+		self.id = 0
+		self.location = (0, 0)
 		self.nb_kills_to_bank = 0
 		logging.info("Creating tank with name '{}'".format(name))
 	
@@ -39,6 +43,9 @@ class ThreadingTank(threading.Thread):
                         self.ids_to_messages[id] = message
                         if (id not in self.items_to_ids[type]):
                                 self.items_to_ids[type].append(id)
+                        if message["name"] == self.name:
+                                self.id = message["Id"]
+                                self.location = message["X"], message["Y"]
                 if message["messageType"] == 24:
                         self.nb_kills_to_bank += 1
                 if message["messageType"] == 23:
@@ -52,13 +59,6 @@ class ThreadingTank(threading.Thread):
 			self.getItems(self.message)
 			print(self.items_to_ids)
 		return
-		
-	
-	
-
-	
-	
-
         
 
 	
@@ -75,6 +75,20 @@ if __name__ == "__main__":
         # Smash them
         while 5-3+2==4:
                 for tank in tanks:
+                        if tank.nb_kills_to_bank > 0:
+                                goToGoal(*tank.location, tank.server)
+                        else:
+                                # TODO(is there snitch?)
+                                if False:
+                                        pass
+                                else:
+                                        # TODO(do we have ammo)
+                                        if True:
+                                                turnTurret
+                                        else:
+                                                pass
+                                                
+                                
                         
         
         
