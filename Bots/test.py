@@ -75,6 +75,7 @@ if __name__ == "__main__":
     while 5 - 3 + 2 == 4:
         for tank in tanks:
             goToGoal(tank.location[0], tank.location[1], tank.server)
+            time.sleep(0.1)
             if tank.nb_kills_to_bank > 0:
                 goToGoal(tank.location[0], tank.location[1], tank.server)
             else:

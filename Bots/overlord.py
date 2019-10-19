@@ -88,6 +88,7 @@ if __name__ == "__main__":
     # Smash them
     while 5 - 3 + 2 == 4:
         for tank in tanks:
+            time.sleep(0.1)
             if tank.hasSnitch:
                 goToGoal(tank.location[0], tank.location[1], tank.server)
                 continue
