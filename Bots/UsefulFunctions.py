@@ -281,6 +281,16 @@ def seekerExists(our_tanks):
 			return True
 	return False
 
+def goToSnitch(our_tanks, server):
+	for tank in our_tanks:
+		for object in our_tank.ids_to_messages.values():
+			if object['Name'] == "Snitch":
+				target_distance = sqrt((tank['X'] - object['X']) ** 2 + (tank['Y'] - object['Y']) ** 2)
+				turnTankToFaceTarget(tank['X'], tank['Y'], object['X'], object['Y'])
+				server.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE,
+				                   {'Amount': target_distance})
+
 def turnRandomly(server):
 	logging.info("Turning randomly")
 	server.sendMessage(ServerMessageTypes.TURNTOHEADING, {'Amount': random.randint(0, 359)})
+
