@@ -183,7 +183,7 @@ def turnTankToFaceTarget(x_target, y_target, x_tank, y_tank):
 
 def moveToPoint(x_tank, y_tank, x_target, y_target):
 	turnTankToFaceTarget(x_tank, y_tank, x_target, y_target)
-	distance = 100
+	distance = math.sqrt(math.pow(x_target - x_tank, 2) + math.pow(y_target - y_tank, 2))
 	GameServer.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {'Amount': distance})
 
 
@@ -198,18 +198,19 @@ myYCoord = 0
 logging.info("Creating tank with name '{}'".format("TeamB:SBot"))
 GameServer.sendMessage(ServerMessageTypes.CREATETANK, {'Name': myName})
 
-# Main loop - read game messages, ignore them and randomly perform actions
-i=0
+# Main loop
 while True:
 	message = GameServer.readMessage()
 	print(message)
-	GameServer.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {"Amount": 90})
-	GameServer.sendMessage(ServerMessageTypes.TURNTURRETTOHEADING, {"Amount": 90})
-	GameServer.sendMessage(ServerMessageTypes.TURNTOHEADING, {"Amount": 100})
-	GameServer.sendMessage(ServerMessageTypes.FIRE)
+
+	# GameServer.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {"Amount": 90})
+	# GameServer.sendMessage(ServerMessageTypes.MOVEBACKWARSDISTANCE, {"Amount": 90})
+	#
+	# GameServer.sendMessage(ServerMessageTypes.TURNTURRETTOHEADING, {"Amount": 90})
+	# GameServer.sendMessage(ServerMessageTypes.TURNTOHEADING, {"Amount": 100})
+	# GameServer.sendMessage(ServerMessageTypes.FIRE)
 	if 'Name' not in message:
 		continue
-
 
 	if message['Name'] == myName:
 		myXCoord = message['X']
@@ -221,8 +222,9 @@ while True:
 
 	if message['Name'] == "ManualTank":
 		logging.info("Found target")
-		turnTurretToFaceTarget(myXCoord, myYCoord, message["X"], message["Y"])
+		moveToPoint(myXCoord, myYCoord, message["X"], message["Y"])
+		#turnTurretToFaceTarget(myXCoord, myYCoord, message["X"], message["Y"])
 		logging.info("Firing")
-		GameServer.sendMessage(ServerMessageTypes.FIRE)
+		#GameServer.sendMessage(ServerMessageTypes.FIRE)
 
 
