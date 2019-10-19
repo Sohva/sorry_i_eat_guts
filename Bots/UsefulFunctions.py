@@ -246,7 +246,7 @@ def findClosestEnemy(our_tanks, location, our_team):
 	return result
 
 def getShotHeading(tank, target):
-	time_interval = 0.01
+	time_interval = 0.1
 	tank_pos = (tank['X'], tank['Y'])
 	target_pos_init = (target['X'], target['Y'])
 	#tank_v = getVelocity(tank, (tank['X'], tank['Y']), time_interval)
@@ -310,4 +310,17 @@ def shoot_with_predictive_aiming(tank, target, server):
 	server.sendMessage(ServerMessageTypes.TURNTURRETTOHEADING, {'Amount': shoot_angle})
 	server.sendMessage(ServerMessageTypes.FIRE)
 
-
+def zigzag(tank, server):
+	for i in range(0,100):
+		print()
+		print(i)
+		print()
+		heading = float(tank['Heading'])
+		if i == 0:
+			server.sendMessage(ServerMessageTypes.TURNTOHEADING(heading + 30))
+		elif i == 25:
+			server.sendMessage(ServerMessageTypes.TURNTOHEADING(heading - 60))
+		elif i == 75:
+			server.sendMessage(ServerMessageTypes.TURNTOHEADING(heading + 60))
+		elif i == 99:
+			server.sendMessage(ServerMessageTypes.TURNTOHEADING(heading - 30))

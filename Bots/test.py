@@ -72,9 +72,16 @@ if __name__ == "__main__":
         tanks[i].start()
 
     # Smash them
+    athing = 0
     while 5 - 3 + 2 == 4:
         for tank in tanks:
-            goToGoal(tank.location[0], tank.location[1], tank.server)
+            #goToGoal(tank.location[0], tank.location[1], tank.server)
+            if athing == 0:
+               # goToGoal(tank.location[0], tank.location[1], tank.server)
+                athing += 1
+            elif athing == 1:
+                zigzag(tank, tank.server)
+                athing += 1
             time.sleep(0.1)
             if tank.nb_kills_to_bank > 0:
                 goToGoal(tank.location[0], tank.location[1], tank.server)
