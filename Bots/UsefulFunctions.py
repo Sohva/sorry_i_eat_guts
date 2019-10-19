@@ -233,6 +233,18 @@ def findClosestAmmo(our_tanks, location):
 					closest_location = (object['X'], object['Y'])
 	return closest_location
 
+def findClosestHealth(our_tanks, location):
+	closest_distance = 10000
+	closest_location = None
+	for our_tank in our_tanks:
+		for object in our_tank.ids_to_messages.values():
+			if object["Type"].split(":")[0] == "HealthPickup":
+				distance = math.sqrt((location[0] - object['X']) ** 2 + (location[1] - object['Y']) ** 2)
+				if distance < closest_distance:
+					closest_distance = distance
+					closest_location = (object['X'], object['Y'])
+	return closest_location
+
 def findClosestEnemy(our_tanks, location, our_team):
 	closest_distance = 100000
 	result = None

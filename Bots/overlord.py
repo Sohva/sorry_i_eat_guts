@@ -7,10 +7,28 @@ import threading
 import time
 import logging
 
+msTime = lambda: int(round(time.time() * 1000))
+
+class MessageDigest:
+
+    def __init__(self, messageType):
+        self.messages = []
+        self.windowSize = 40
+        self.messageType = messageType
+
+    def addMessage(self, message):
+
+        message["msTime"] = msTime()
+        
+        if message["messagetype"] == self.messageType:
+            self.messages.append(message)
+            while (len(self.messages) > self.windowSize):
+                self.messages.pop(0)
+
 
 class ThreadingTank(threading.Thread):
 
-    def __init__(self, name, port=8052, hostname='127.0.0.1', danger_health=4):
+    def __init__(self, name, port=8052, hostname='127.0.0.1', danger_health=100):
         threading.Thread.__init__(self)
         self.ids_to_messages = {}
         self.items_to_ids = {
@@ -102,13 +120,27 @@ if __name__ == "__main__":
                 goToGoal(tank.location[0], tank.location[1], tank.server)
             else:
                 print("not killed someone")
-                
                 if snitch_appeared:
                     print("snitch appeared")
                     if seekerExists(tanks):
                         pass
+                    else: #there is no seeker
+                        if closestToSnitch(tanks, tank):
+                            tank.isSeeker = True
+                            continue
+                if tank.info.get("Health", 1000) <= tank.danger_health:
+                    print("low health :(")
+                    closest_health = findClosestHealth(tanks, tank.location)
+                    if closest_health:
+                        print("moving to health")
+                        moveToPoint(tank.location[0],
+                                    tank.location[1],
+                                    closest_health[0],
+                                    closest_health[1],
+                                    tank.server)
                     else:
-                        tank.isSeeker = True
+                        print("no health on map :((")
+                        turnRandomly(tank.server)
                 else:
                     print("snitch not appeared")
                     if tank.ammo > 0:
