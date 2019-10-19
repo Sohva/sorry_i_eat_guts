@@ -269,3 +269,9 @@ def moveRandomely(server):
 	server.sendMessage(ServerMessageTypes.TURNTOHEADING, {'Amount': random.randint(0, 359)})
 	logging.info("Moving randomly")
 	server.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {'Amount': random.randint(0, 10)})
+
+def seekerExists(our_tanks):
+	for tank in our_tanks:
+		if tank.isSeeker:
+			return True
+	return False
