@@ -243,6 +243,10 @@ def findClosestEnemy(our_tanks, location, our_team):
 					closest_location = (object['X'],object['Y'])
 	return closest_location
 
+def predictiveAiming(location, server):
+
+	return shotHeading
+
 def moveRandomely(server):
 	logging.info("Turning randomly")
 	server.sendMessage(ServerMessageTypes.TURNTOHEADING, {'Amount': random.randint(0, 359)})
