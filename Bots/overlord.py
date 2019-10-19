@@ -101,7 +101,7 @@ if __name__ == "__main__":
                 goToGoal(tank.location[0], tank.location[1], tank.server)
             else:
                 print("not killed someone")
-
+                
                 if snitch_appeared:
                     print("snitch appeared")
                     if seekerExists(tanks):
