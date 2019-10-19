@@ -337,3 +337,23 @@ def zigzag(tank, server):
 
 def shoot(server):
 	server.sendMessage(ServerMessageTypes.FIRE)
+
+def closestToSnitch(objects, tank):
+	snitch_pos = Null
+	for object in objects.ids_to_messages.values():
+		if object['Name'] == "Snitch":
+			snitch_pos = (object['X'], object['Y'])
+
+	if snitch_pos == Null:
+		return None
+
+	closest_distance = sqrt((tank.info['X'] - snitch_pos[0]) ** 2 +
+			                (tank.info['Y'] - snitch_pos[1]) ** 2)
+	this_tank_closest = True
+	for object in objects:
+		if object.info['Id'] != tank.info['Id'] and object.info['Type'] == "Tank":
+			if sqrt((tank.info['X'] - object.info['X']) ** 2 +
+			        (tank.info['Y'] - object.info['Y']) ** 2) < closest_distance:
+				this_tank_closest = False
+
+	return this_tank_closest
