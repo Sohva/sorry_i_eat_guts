@@ -8,9 +8,9 @@ import struct
 import argparse
 import random
 import math
-from datetime import datetime
-from datetime import date
+
 import time
+
 
 
 class ServerMessageTypes(object):
@@ -175,20 +175,45 @@ else:
 
 
 def turnTurretToFaceTarget(x_tank, y_tank, x_target, y_target):
-	turn_angle = math.atan2(-y_target + y_tank, x_target - x_tank) * 360 / (2 * math.pi)
-	print("Turn Angle: " + str(turn_angle) + "\n")
+	x_diff = x_target - x_tank
+	y_diff = y_target - y_tank
+
+	if x_diff >= 0:
+		if y_diff >= 0:
+			turn_angle = 360 - (math.atan2(y_diff, x_diff) * 360 / (2 * math.pi))
+		else:
+			turn_angle = -math.atan2(y_diff, x_diff) * 360 / (2 * math.pi)
+	else:
+		if y_diff >= 0:
+			turn_angle = 360 - (math.atan2(y_diff, x_diff) * 360 / (2 * math.pi))
+		else:
+			turn_angle = -math.atan2(y_diff, x_diff) * 360 / (2 * math.pi)
+
 	GameServer.sendMessage(ServerMessageTypes.TURNTURRETTOHEADING, {"Amount": turn_angle})
 
 
 def turnTankToFaceTarget(x_tank, y_tank, x_target, y_target):
-	turn_angle = math.atan2(-y_target + y_tank, x_target - x_tank) * 360 / (2 * math.pi)
+	x_diff = x_target - x_tank
+	y_diff = y_target - y_tank
+
+	if x_diff >= 0:
+		if y_diff >= 0:
+			turn_angle = 360 - (math.atan2(y_diff, x_diff) * 360 / (2 * math.pi))
+		else:
+			turn_angle = -math.atan2(y_diff, x_diff) * 360 / (2 * math.pi)
+	else:
+		if y_diff >= 0:
+			turn_angle = 360 - (math.atan2(y_diff, x_diff) * 360 / (2 * math.pi))
+		else:
+			turn_angle = -math.atan2(y_diff, x_diff) * 360 / (2 * math.pi)
+
 	GameServer.sendMessage(ServerMessageTypes.TURNTOHEADING, {"Amount": turn_angle})
 
 
 def moveToPoint(x_tank, y_tank, x_target, y_target):
 	turnTankToFaceTarget(x_tank, y_tank, x_target, y_target)
 	distance = math.sqrt(math.pow(x_target - x_tank, 2) + math.pow(y_target - y_tank, 2))
-	GameServer.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {'Amount': distance})
+	#GameServer.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {'Amount': distance})
 
 
 # Connect to game server
@@ -231,11 +256,13 @@ while True:
 
 	if message['Name'] == "ManualTank":
 		logging.info("Found target")
+
 		now = time.time()
 		print("now minus lastTurnTime seconds is ", now - lastTurnTime)
 		if now - lastTurnTime > 1:
 			turnTurretToFaceTarget(myXCoord, myYCoord, message["X"], message["Y"])
 			lastTurnTime = time.time()
+
 
 		moveToPoint(myXCoord, myYCoord, message["X"], message["Y"])
 		logging.info("Firing")
