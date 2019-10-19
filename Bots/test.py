@@ -2,10 +2,10 @@
 
 from ServerMessageTypes import ServerMessageTypes
 from ServerComms import ServerComms
+from UsefulFunctions import *
 import threading
 import time
 import logging
-from UsefulFunctions import *
 
 
 class ThreadingTank(threading.Thread):
@@ -22,6 +22,8 @@ class ThreadingTank(threading.Thread):
         self.status = {}
         self.server = ServerComms(hostname, port)
         self.name = name
+        self.id = 0
+        self.location = (0, 0)
         self.nb_kills_to_bank = 0
         logging.info("Creating tank with name '{}'".format(name))
 
@@ -41,6 +43,9 @@ class ThreadingTank(threading.Thread):
             self.ids_to_messages[id] = message
             if (id not in self.items_to_ids[type]):
                 self.items_to_ids[type].append(id)
+            if message["Name"] == self.name:
+                self.id = message["Id"]
+                self.location = message["X"], message["Y"]
         if message["messageType"] == 24:
             self.nb_kills_to_bank += 1
         if message["messageType"] == 23:
@@ -69,8 +74,22 @@ if __name__ == "__main__":
     # Smash them
     while 5 - 3 + 2 == 4:
         for tank in tanks:
+            goToGoal(tank.location[0], tank.location[1], tank.server)
+            if tank.nb_kills_to_bank > 0:
+                goToGoal(tank.location[0], tank.location[1], tank.server)
+            else:
+                # TODO(is there snitch?)
+                if False:
+                    pass
+                else:
+                    # TODO(do we have ammo)
+                    if True:
+                        pass
+                    else:
+                        pass
 
-            goToGoal()
+
+
 
 
 

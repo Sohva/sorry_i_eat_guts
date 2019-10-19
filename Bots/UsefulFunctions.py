@@ -214,7 +214,7 @@ def moveToPoint(x_tank, y_tank, x_target, y_target, server):
 	server.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {'Amount': distance})
 
 def goToGoal(x_tank, y_tank, server):
-	if y >=0:
-		moveToPoint(x_tank, y_tank, 100, 0, server)
+	if y_tank >= 0:
+		moveToPoint(x_tank, y_tank, 0, 100, server)
 	else:
-		moveToPoint(x_tank, y_tank, -100, 0, server)
+		moveToPoint(x_tank, y_tank, 0, -100, server)
