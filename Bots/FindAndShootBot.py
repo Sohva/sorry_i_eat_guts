@@ -171,15 +171,15 @@ else:
 	logging.basicConfig(format='[%(asctime)s] %(message)s', level=logging.INFO)
 
 
-def turnTurretToFaceTarget(x_target, y_target, x_tank, y_tank):
-	turn_angle = math.atan2(y_target - y_tank, x_target - x_tank)
+def turnTurretToFaceTarget(x_tank, y_tank, x_target, y_target):
+	turn_angle = math.atan2(-y_target + y_tank, x_target - x_tank) * 360 / (2 * math.pi)
+	print("Turn Angle: " + str(turn_angle) + "\n")
 	GameServer.sendMessage(ServerMessageTypes.TURNTURRETTOHEADING, {"Amount": turn_angle})
 
 
-def turnTankToFaceTarget(x_target, y_target, x_tank, y_tank):
-	turn_angle = math.atan2(y_target - y_tank, x_target - x_tank)
+def turnTankToFaceTarget(x_tank, y_tank, x_target, y_target):
+	turn_angle = math.atan2(-y_target + y_tank, x_target - x_tank) * 360 / (2 * math.pi)
 	GameServer.sendMessage(ServerMessageTypes.TURNTOHEADING, {"Amount": turn_angle})
-
 
 def moveToPoint(x_tank, y_tank, x_target, y_target):
 	turnTankToFaceTarget(x_tank, y_tank, x_target, y_target)
@@ -203,12 +203,14 @@ while True:
 	message = GameServer.readMessage()
 	print(message)
 
+
 	# GameServer.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {"Amount": 90})
 	# GameServer.sendMessage(ServerMessageTypes.MOVEBACKWARSDISTANCE, {"Amount": 90})
 	#
 	# GameServer.sendMessage(ServerMessageTypes.TURNTURRETTOHEADING, {"Amount": 90})
 	# GameServer.sendMessage(ServerMessageTypes.TURNTOHEADING, {"Amount": 100})
 	# GameServer.sendMessage(ServerMessageTypes.FIRE)
+
 	if 'Name' not in message:
 		continue
 
@@ -226,5 +228,6 @@ while True:
 		#turnTurretToFaceTarget(myXCoord, myYCoord, message["X"], message["Y"])
 		logging.info("Firing")
 		#GameServer.sendMessage(ServerMessageTypes.FIRE)
+
 
 
