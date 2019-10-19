@@ -23,6 +23,7 @@ class ThreadingTank(threading.Thread):
         self.server = ServerComms(hostname, port)
         self.name = name
         self.id = 0
+        self.info = {}
         self.location = (0, 0)
         self.nb_kills_to_bank = 0
         self.ammo = 0
@@ -50,6 +51,7 @@ class ThreadingTank(threading.Thread):
                 self.id = message["Id"]
                 self.location = message["X"], message["Y"]
                 self.ammo = message["Ammo"]
+                self.info = message
         if message["messageType"] == 24:
             self.nb_kills_to_bank += 1
         if message["messageType"] == 23:
@@ -67,7 +69,6 @@ class ThreadingTank(threading.Thread):
             self.message = self.server.readMessage()
             # logging.info(self.message)
             self.getItems(self.message)
-            print(self.items_to_ids)
         return
 
 
@@ -76,7 +77,7 @@ snitch_appeared = False
 if __name__ == "__main__":
     logging.basicConfig(format='[%(asctime)s] %(message)s', level=logging.INFO)
 
-    nb_tanks_to_spawn = 1
+    nb_tanks_to_spawn = 4
     TEAM = "TeamA"
     tanks = []
     shoot_range = 50
@@ -88,7 +89,7 @@ if __name__ == "__main__":
     # Smash them
     while 5 - 3 + 2 == 4:
         for tank in tanks:
-            time.sleep(0.1)
+            time.sleep(0.05)
             if tank.hasSnitch:
                 goToGoal(tank.location[0], tank.location[1], tank.server)
                 continue
@@ -114,25 +115,22 @@ if __name__ == "__main__":
                         closest_enemy = findClosestEnemy(tanks, tank.location, TEAM)
                         if not closest_enemy:
                             print("no closest enemy")
-                            # moveRandomly(tank.server)
-                            continue
-                            pass
-                        elif distanceTo(tank.location, closest_enemy) < shoot_range:
-                            print("closest enemy in range")
-                            turnTurretToFaceTarget(tank.location[0],
-                                                   tank.location[1],
-                                                   closest_enemy[0],
-                                                   closest_enemy[1],
-                                                   tank.server)
-                            print("shooting now")
-                            shoot(tank.server)
+                            turnRandomly(tank.server)
                         else:
-                            print("closest enemy out of range")
                             moveToPoint(tank.location[0],
                                         tank.location[1],
                                         closest_enemy[0],
                                         closest_enemy[1],
                                         tank.server)
+                            if distanceTo(tank.location, closest_enemy) < shoot_range:
+                                print("shooting now")
+                                turnTurretToFaceTarget(tank.location[0],
+                                                   tank.location[1],
+                                                   closest_enemy[0],
+                                                   closest_enemy[1],
+                                                   tank.server)
+                                tank.server.sendMessage(ServerMessageTypes.FIRE)
+                                
 #get ammo
                     else:
                         print("no ammo :(")
@@ -146,8 +144,7 @@ if __name__ == "__main__":
                                         tank.server)
                         else:
                             print("no ammo on map :((")
-                            #moveRandomly(tank.server)
-                            pass
+                            turnRandomly(tank.server)
 
 
 
