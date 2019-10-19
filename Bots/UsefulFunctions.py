@@ -190,6 +190,7 @@ def turnTurretToFaceTarget(x_tank, y_tank, x_target, y_target, server):
 
 	server.sendMessage(ServerMessageTypes.TURNTURRETTOHEADING, {"Amount": turn_angle})
 
+	return turn_angle
 
 def turnTankToFaceTarget(x_tank, y_tank, x_target, y_target, server):
 	x_diff = x_target - x_tank
@@ -205,7 +206,7 @@ def turnTankToFaceTarget(x_tank, y_tank, x_target, y_target, server):
 			turn_angle = 360 - (math.atan2(y_diff, x_diff) * 360 / (2 * math.pi))
 		else:
 			turn_angle = -math.atan2(y_diff, x_diff) * 360 / (2 * math.pi)
-
+	print(turn_angle)
 	server.sendMessage(ServerMessageTypes.TURNTOHEADING, {"Amount": turn_angle})
 
 
