@@ -221,40 +221,40 @@ def goToGoal(x_tank, y_tank, server):
 	else:
 		moveToPoint(x_tank, y_tank, 0, -100, server)
 
-def findClosestAmmo(our_tanks, location):
-	closest_distance = 10000
-	closest_location = None
-	for our_tank in our_tanks:
-		for object in our_tank.ids_to_messages.values():
-			if object["Type"].split(":")[0] == "AmmoPickup":
-				distance = math.sqrt((location[0] - object['X']) ** 2 + (location[1] - object['Y']) ** 2)
-				if distance < closest_distance:
-					closest_distance = distance
-					closest_location = (object['X'], object['Y'])
-	return closest_location
-
-def findClosestHealth(our_tanks, location):
-	closest_distance = 10000
-	closest_location = None
-	for our_tank in our_tanks:
-		for object in our_tank.ids_to_messages.values():
-			if object["Type"].split(":")[0] == "HealthPickup":
-				distance = math.sqrt((location[0] - object['X']) ** 2 + (location[1] - object['Y']) ** 2)
-				if distance < closest_distance:
-					closest_distance = distance
-					closest_location = (object['X'], object['Y'])
-	return closest_location
-
-def findClosestEnemy(our_tanks, location, our_team):
+def findClosestAmmo(tank):
 	closest_distance = 100000
 	result = None
-	for our_tank in our_tanks:
-		for object in our_tank.ids_to_messages.values():
-			if object['Type'] == "Tank" and object["Name"].split(":")[0] != our_team:
-				distance = math.sqrt((location[0] - object['X'])**2 + (location[1] - object['Y'])**2)
-				if distance < closest_distance:
-					closest_distance = distance
-					result = (object['X'], object['Y'], object['Id'])
+	location = tank.location
+	for object in tank.dictOfThings.messages.values():
+		if object["Type"].split(":")[0] == "AmmoPickup":
+			distance = math.sqrt((location[0] - object['X']) ** 2 + (location[1] - object['Y']) ** 2)
+			if distance < closest_distance:
+				closest_distance = distance
+				result = (object['X'], object['Y'], object['Id'])
+	return result
+
+def findClosestHealth(tank):
+	closest_distance = 100000
+	result = None
+	location = tank.location
+	for object in tank.dictOfThings.messages.values():
+		if object["Type"].split(":")[0] == "HealthPickup":
+			distance = math.sqrt((location[0] - object['X']) ** 2 + (location[1] - object['Y']) ** 2)
+			if distance < closest_distance:
+				closest_distance = distance
+				result = (object['X'], object['Y'], object['Id'])
+	return result
+
+def findClosestEnemy(tank, our_team):
+	closest_distance = 100000
+	result = None
+	location = tank.location
+	for object in tank.dictOfThings.messages.values():
+		if object['Type'] == "Tank" and object["Name"].split(":")[0] != our_team:
+			distance = math.sqrt((location[0] - object['X'])**2 + (location[1] - object['Y'])**2)
+			if distance < closest_distance:
+				closest_distance = distance
+				result = (object['X'], object['Y'], object['Id'])
 	return result
 
 def getShotHeading(tank, target):
@@ -351,20 +351,20 @@ def shoot(server):
 	server.sendMessage(ServerMessageTypes.FIRE)
 
 def closestToSnitch(objects, tank):
-	snitch_pos = Null
+	snitch_pos = None
 	for object in objects.ids_to_messages.values():
 		if object['Name'] == "Snitch":
 			snitch_pos = (object['X'], object['Y'])
 
-	if snitch_pos == Null:
+	if snitch_pos == None:
 		return None
 
-	closest_distance = sqrt((tank.info['X'] - snitch_pos[0]) ** 2 +
+	closest_distance = math.sqrt((tank.info['X'] - snitch_pos[0]) ** 2 +
 			                (tank.info['Y'] - snitch_pos[1]) ** 2)
 	this_tank_closest = True
 	for object in objects:
 		if object.info['Id'] != tank.info['Id'] and object.info['Type'] == "Tank":
-			if sqrt((tank.info['X'] - object.info['X']) ** 2 +
+			if math.sqrt((tank.info['X'] - object.info['X']) ** 2 +
 			        (tank.info['Y'] - object.info['Y']) ** 2) < closest_distance:
 				this_tank_closest = False
 
