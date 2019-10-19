@@ -11,13 +11,16 @@ class ThreadingTank(threading.Thread):
 	def __init__(self, name, port=8052, hostname='127.0.0.1'):
 		threading.Thread.__init__(self)
 		self.ids_to_messages = {}
-		self.items_to_ids = {"Tank":[], 
+		self.items_to_ids = {
+                "Tank":[], 
 		"HealthPickup": [], 
 		"AmmoPickup": [],
-		"SnitchPickup": []}
+		"SnitchPickup": []
+                }
 		self.status = {}
 		self.server = ServerComms(hostname, port)
 		self.name = name
+		self.nb_kills_to_bank = 0
 		logging.info("Creating tank with name '{}'".format(name))
 	
 	
@@ -30,14 +33,16 @@ class ThreadingTank(threading.Thread):
 		#logging.info("Attempted to " + ServerMessageTypes.toString(newMessage))
 	
 	def getItems(self, message):
-		if not "Id" in message:
-			return
-			
-		id = message["Id"]
-		type = message["Type"]
-		self.ids_to_messages[id] = message
-		if (id not in self.items_to_ids[type]):
-			self.items_to_ids[type].append(id)
+		if "Id" in message:
+                        id = message["Id"]
+                        type = message["Type"]
+                        self.ids_to_messages[id] = message
+                        if (id not in self.items_to_ids[type]):
+                                self.items_to_ids[type].append(id)
+                if message["messageType"] == 24:
+                        self.nb_kills_to_bank += 1
+                if message["messageType"] == 23:
+                        self.nb_kills_to_bank = 0
 			
 	def run(self):
 		self.server.sendMessage(ServerMessageTypes.CREATETANK, {'Name': self.name, })
@@ -62,10 +67,17 @@ if __name__ == "__main__":
 	
 	TEAM = "TeamA"
 	tanks = []
+	# Initialise tanks
 	for i in range(4):
 		tanks.append(ThreadingTank(TEAM+":{}".format(i)))
-		tanks[-1].start()
+		tanks[i].start()
 		
+        # Smash them
+        while 5-3+2==4:
+                for tank in tanks:
+                        
+        
+        
 	
 	
     
