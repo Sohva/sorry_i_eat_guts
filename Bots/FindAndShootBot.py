@@ -211,7 +211,7 @@ def turnTankToFaceTarget(x_tank, y_tank, x_target, y_target):
 def moveToPoint(x_tank, y_tank, x_target, y_target):
 	turnTankToFaceTarget(x_tank, y_tank, x_target, y_target)
 	distance = math.sqrt(math.pow(x_target - x_tank, 2) + math.pow(y_target - y_tank, 2))
-	#GameServer.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {'Amount': distance})
+	GameServer.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {'Amount': distance})
 
 
 # Connect to game server
@@ -252,13 +252,10 @@ while True:
 
 	if message['Name'] == "ManualTank":
 		logging.info("Found target")
-		#if (dt.now() - lastTurnTime).total_seconds() < 1:
-		#	turnTurretToFaceTarget(myXCoord, myYCoord, message["X"], message["Y"])
-		#	lastTurnTime = dt.now()
-
+		turnTurretToFaceTarget(myXCoord, myYCoord, message["X"], message["Y"])
 		moveToPoint(myXCoord, myYCoord, message["X"], message["Y"])
 		logging.info("Firing")
-		#GameServer.sendMessage(ServerMessageTypes.FIRE)
+		GameServer.sendMessage(ServerMessageTypes.FIRE)
 
 
 
