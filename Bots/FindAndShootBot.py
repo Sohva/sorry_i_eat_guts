@@ -181,6 +181,7 @@ def turnTankToFaceTarget(x_tank, y_tank, x_target, y_target):
 	turn_angle = math.atan2(-y_target + y_tank, x_target - x_tank) * 360 / (2 * math.pi)
 	GameServer.sendMessage(ServerMessageTypes.TURNTOHEADING, {"Amount": turn_angle})
 
+
 def moveToPoint(x_tank, y_tank, x_target, y_target):
 	turnTankToFaceTarget(x_tank, y_tank, x_target, y_target)
 	distance = math.sqrt(math.pow(x_target - x_tank, 2) + math.pow(y_target - y_tank, 2))
@@ -202,7 +203,6 @@ GameServer.sendMessage(ServerMessageTypes.CREATETANK, {'Name': myName})
 while True:
 	message = GameServer.readMessage()
 	print(message)
-
 
 	# GameServer.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {"Amount": 90})
 	# GameServer.sendMessage(ServerMessageTypes.MOVEBACKWARSDISTANCE, {"Amount": 90})
