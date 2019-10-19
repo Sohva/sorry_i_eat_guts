@@ -76,7 +76,7 @@ snitch_appeared = False
 if __name__ == "__main__":
     logging.basicConfig(format='[%(asctime)s] %(message)s', level=logging.INFO)
 
-    nb_tanks_to_spawn = 3
+    nb_tanks_to_spawn = 1
     TEAM = "TeamA"
     tanks = []
     shoot_range = 50
@@ -125,7 +125,7 @@ if __name__ == "__main__":
                                                    closest_enemy[1],
                                                    tank.server)
                             print("shooting now")
-                            shoot_with_predictive_aiming(tank.ids_to_messages[tank.Id], tank.ids_to_messages[closest_enemy[2]], tank.server)
+                            shoot_with_predictive_aiming(tank.ids_to_messages[tank.id], tank.ids_to_messages[closest_enemy[2]], tank.server)
                         else:
                             print("closest enemy out of range")
                             moveToPoint(tank.location[0],
