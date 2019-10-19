@@ -7,19 +7,65 @@ import threading
 import time
 import logging
 
+msTime = lambda: int(round(time.time() * 1000))
+
+class DictOfThings(threading.Thread):
+
+    def __init__(self, window_size=40):
+        threading.Thread.__init__(self)
+        self.messages = {}
+        self.windowSize = window_size
+
+    def addMessage(self, message):
+        print("all the messages", self.messages)
+        print("adding message", message)
+        message["msTime"] = msTime()
+
+        self.messages[message["Id"]] = message
+
+    def deleteMessage(self, id):
+        self.messages.pop(id, None)
+        print("deleting message with id ", id)
+
+    def run(self):
+        while True:
+            time.sleep(1)
+            print("debedababidebadabo ",self.messages)
+            keys = self.messages.keys().copy()
+            for object_id in keys:
+                if (msTime() - self.messages[object_id]["msTime"]) > 3000:
+                    self.deleteMessage(object_id)
+
+
+
+
+class MessageDigest:
+
+    def __init__(self, messageType):
+        self.messages = []
+        self.windowSize = 40
+        self.messageType = messageType
+
+    def addMessage(self, message):
+
+        message["msTime"] = msTime()
+
+        if message["messagetype"] == self.messageType:
+            self.messages.append(message)
+            while (len(self.messages) > self.windowSize):
+                self.messages.pop(0)
+
 
 class ThreadingTank(threading.Thread):
 
-    def __init__(self, name, port=8052, hostname='127.0.0.1', danger_health=4,
+
+    def __init__(self, name, dictOfThings, port=8052, hostname='127.0.0.1', danger_health=1,
                  zigzagging = False):
+
         threading.Thread.__init__(self)
-        self.ids_to_messages = {}
-        self.items_to_ids = {
-            "Tank": [],
-            "HealthPickup": [],
-            "AmmoPickup": [],
-            "Snitch": []
-        }
+
+        self.dictOfThings = dictOfThings
+
         self.status = {}
         self.server = ServerComms(hostname, port)
         self.name = name
@@ -32,6 +78,7 @@ class ThreadingTank(threading.Thread):
         self.hasSnitch = False
         self.danger_health = danger_health
         self.zigzagging = zigzagging
+
         logging.info("Creating tank with name '{}'".format(name))
 
     """
@@ -44,32 +91,44 @@ class ThreadingTank(threading.Thread):
     # logging.info("Attempted to " + ServerMessageTypes.toString(newMessage))
 
     def getItems(self, message):
-        if "Id" in message:
-            id = message["Id"]
-            type = message["Type"]
-            self.ids_to_messages[id] = message
-            if (id not in self.items_to_ids[type]):
-                self.items_to_ids[type].append(id)
+        if message["messageType"] == 18: #an item in view
+            self.dictOfThings.addMessage(message)
             if message["Name"] == self.name:
                 self.id = message["Id"]
                 self.location = message["X"], message["Y"]
                 self.ammo = message["Ammo"]
                 self.info = message
-        if message["messageType"] == 24:
+
+        if message["messageType"] == 24: #killed someone
             self.nb_kills_to_bank += 1
-        if message["messageType"] == 23:
+
+        if message["messageType"] == 23: #got to goal
             self.nb_kills_to_bank = 0
-        if message["messageType"] == 25:
+
+        if message["messageType"] == 25: #snitch appeared on pitch
             global snitch_appeared
             snitch_appeared = True
-        if (message["messageType"] == 21) and (message["Id"] == self.id):
+
+        if (message["messageType"] == 21) and (message["Id"] == self.id): #got the snitch!
             self.hasSnitch = True
+
+        if message["messageType"] == 19: #health pack pick up
+            healthPack = findClosestHealth(self)
+            if healthPack:
+                self.dictOfThings.deleteMessage(healthPack[2])
+
+        if message["messageType"] == 20: #ammo pick up
+            ammoPack = findClosestAmmo(self)
+            if ammoPack:
+                self.dictOfThings.deleteMessage(ammoPack[2])
 
 
     def run(self):
         self.server.sendMessage(ServerMessageTypes.CREATETANK, {'Name': self.name, })
         while True:
+
             self.message = self.server.readMessage()
+
             # logging.info(self.message)
             self.getItems(self.message)
         return
@@ -85,8 +144,10 @@ if __name__ == "__main__":
     tanks = []
     shoot_range = 50
     # Initialise tanks
+    globalDictOfThings = DictOfThings()
+    globalDictOfThings.start()
     for i in range(nb_tanks_to_spawn):
-        tanks.append(ThreadingTank(TEAM + ":{}".format(i)))
+        tanks.append(ThreadingTank(TEAM + ":{}".format(i), globalDictOfThings))
         tanks[i].start()
 
     # Smash them
@@ -102,24 +163,41 @@ if __name__ == "__main__":
             if tank.nb_kills_to_bank > 0:
                 print("killed someone")
                 goToGoal(tank.location[0], tank.location[1], tank.server)
-                if not tank.zigzagging and -50 < tank.info['Y'] < 50 and\
-                    60 < tank.info['Heading'] < 120 or 240 < tank.info['Heading'] < 300:
-                    print("ZIGZAG")
+                if not tank.zigzagging and -70 < tank.info['Y'] < 70 and\
+                    (((60 < tank.info['Heading'] <= 90 or 300 > tank.info['Heading'] >= 270)\
+                    and tank.info['X'] <= 0) or \
+                    ((90 < tank.info['Heading'] < 120 or 240 < tank.info['Heading'] < 270)
+                    and tank.info['X'] > 0)):
+                    print("ZIGZAG\n\n\n")
                     zigzag(tank, tank.server)
             else:
                 print("not killed someone")
-
                 if snitch_appeared:
                     print("snitch appeared")
                     if seekerExists(tanks):
                         pass
+                    else: #there is no seeker
+                        if closestToSnitch(tanks, tank):
+                            tank.isSeeker = True
+                            continue
+                if tank.info.get("Health", 1000) <= tank.danger_health:
+                    print("low health :(")
+                    closest_health = findClosestHealth(tank)
+                    if closest_health:
+                        print("moving to health")
+                        moveToPoint(tank.location[0],
+                                    tank.location[1],
+                                    closest_health[0],
+                                    closest_health[1],
+                                    tank.server)
                     else:
-                        tank.isSeeker = True
+                        print("no health on map :((")
+                        turnRandomly(tank.server)
                 else:
                     print("snitch not appeared")
                     if tank.ammo > 0:
                         print("have ammo")
-                        closest_enemy = findClosestEnemy(tanks, tank.location, TEAM)
+                        closest_enemy = findClosestEnemy(tank, TEAM)
                         if not closest_enemy:
                             print("no closest enemy")
                             turnRandomly(tank.server)
@@ -141,7 +219,7 @@ if __name__ == "__main__":
 #get ammo
                     else:
                         print("no ammo :(")
-                        closest_ammo = findClosestAmmo(tanks, tank.location)
+                        closest_ammo = findClosestAmmo(tank)
                         if closest_ammo:
                             print("moving to ammo")
                             moveToPoint(tank.location[0],
@@ -152,10 +230,6 @@ if __name__ == "__main__":
                         else:
                             print("no ammo on map :((")
                             turnRandomly(tank.server)
-
-            print("ZIGZAGGING")
-            print(tank.zigzagging)
-            print("\n\n")
 
 
 
