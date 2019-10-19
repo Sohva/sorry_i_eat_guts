@@ -235,34 +235,43 @@ def findClosestAmmo(our_tanks, location):
 
 def findClosestEnemy(our_tanks, location, our_team):
 	closest_distance = 100000
-	closest_location = None
+	result = None
 	for our_tank in our_tanks:
 		for object in our_tank.ids_to_messages.values():
 			if object['Type'] == "Tank" and object["Name"].split(":")[0] != our_team:
 				distance = math.sqrt((location[0] - object['X'])**2 + (location[1] - object['Y'])**2)
 				if distance < closest_distance:
 					closest_distance = distance
-					closest_location = (object['X'],object['Y'])
-	return closest_location
+					result = (object['X'], object['Y'], object['Id'])
+	return result
 
 def getShotHeading(tank, target):
 	time_interval = 0.01
-	tank_pos = (0,0)
-	target_pos = (0,0)
+	tank_pos = (tank['X'], tank['Y'])
+	target_pos_init = (target['X'], target['Y'])
 	#tank_v = getVelocity(tank, (tank['X'], tank['Y']), time_interval)
-	target_v = getVelocity(target, (target['X'], target['Y']), time_interval)
+	target_v = getVelocity(target, target_pos_init, time_interval)
 
 	y_diff = (target_pos[1] + target_v[1] * time_interval) - tank_pos[1]
 	x_diff = (target_pos[0] + target_v[0] * time_interval) - tank_pos[0]
 
-	shot_heading = math.atan2(y_diff, x_diff)
+	if x_diff >= 0:
+		if y_diff >= 0:
+			shot_heading = 360 - (math.atan2(y_diff, x_diff) * 360 / (2 * math.pi))
+		else:
+			shot_heading = -math.atan2(y_diff, x_diff) * 360 / (2 * math.pi)
+	else:
+		if y_diff >= 0:
+			shot_heading = 360 - (math.atan2(y_diff, x_diff) * 360 / (2 * math.pi))
+		else:
+			shot_heading = -math.atan2(y_diff, x_diff) * 360 / (2 * math.pi)
 
 	return shot_heading
 
-def getVelocity(tank, position, time_interval):
+def getVelocity(tank, init_position, time_interval):
 	time.sleep(time_interval)
-	vx = (tank['X'] - position[0]) / time_interval
-	vy = (tank['Y'] - position[0]) / time_interval
+	vx = (tank['X'] - init_position[0]) / time_interval
+	vy = (tank['Y'] - init_position[0]) / time_interval
 	return tuple(vx,vy)
 
 def moveRandomly(server):
