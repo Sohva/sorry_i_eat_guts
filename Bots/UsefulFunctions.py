@@ -219,15 +219,28 @@ def goToGoal(x_tank, y_tank, server):
 	else:
 		moveToPoint(x_tank, y_tank, 0, -100, server)
 
-def findClosestEnemy(tanks, location, our_team):
+def findClosestAmmo(our_tanks, location):
 	closest_distance = math.inf
 	closest_location = None
-	for tank in tanks:
-		if tank["Name"].split(":")[0] != our_team:
-			distance = sqrt((location[0] - tank['X'])**2 + (location[1] - tank['Y'])**2)
-			if distance < closest_distance:
-				closest_distance = distance
-				closest_location = (tank['X'],tank['Y'])
+	for our_tank in our_tanks:
+		for object in our_tank.ids_to_messages.values():
+			if object["Type"].split(":")[0] == "AmmoPickup":
+				distance = sqrt((location[0] - pickup['X']) ** 2 + (location[1] - pickup['Y']) ** 2)
+				if distance < closest_distance:
+					closest_distance = distance
+					closest_location = (pickup['X'], pickup['Y'])
+	return closest_location
+
+def findClosestEnemy(our_tanks, location, our_team):
+	closest_distance = math.inf
+	closest_location = None
+	for our_tank in our_tanks:
+		for object in our_tank.ids_to_messages.values():
+			if object['Type'] == "Tank" and object["Name"].split(":")[0] != our_team:
+				distance = sqrt((location[0] - object['X'])**2 + (location[1] - object['Y'])**2)
+				if distance < closest_distance:
+					closest_distance = distance
+					closest_location = (object['X'],object['Y'])
 	return closest_location
 
 def moveRandomely(server):
