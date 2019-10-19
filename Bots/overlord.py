@@ -31,7 +31,8 @@ class DictOfThings(threading.Thread):
         while True:
             time.sleep(1)
             print("debedababidebadabo ",self.messages)
-            for object_id in self.messages.keys():
+            keys = self.messages.keys().copy()
+            for object_id in keys:
                 if (msTime() - self.messages[object_id]["msTime"]) > 3000:
                     self.deleteMessage(object_id)
 
@@ -57,7 +58,10 @@ class MessageDigest:
 
 class ThreadingTank(threading.Thread):
 
-    def __init__(self, name, dictOfThings, port=8052, hostname='127.0.0.1', danger_health=1):
+
+    def __init__(self, name, dictOfThings, port=8052, hostname='127.0.0.1', danger_health=1,
+                 zigzagging = False):
+
         threading.Thread.__init__(self)
 
         self.dictOfThings = dictOfThings
@@ -73,6 +77,7 @@ class ThreadingTank(threading.Thread):
         self.isSeeker = False
         self.hasSnitch = False
         self.danger_health = danger_health
+        self.zigzagging = zigzagging
 
         logging.info("Creating tank with name '{}'".format(name))
 
@@ -158,6 +163,13 @@ if __name__ == "__main__":
             if tank.nb_kills_to_bank > 0:
                 print("killed someone")
                 goToGoal(tank.location[0], tank.location[1], tank.server)
+                if not tank.zigzagging and -70 < tank.info['Y'] < 70 and\
+                    (((60 < tank.info['Heading'] <= 90 or 300 > tank.info['Heading'] >= 270)\
+                    and tank.info['X'] <= 0) or \
+                    ((90 < tank.info['Heading'] < 120 or 240 < tank.info['Heading'] < 270)
+                    and tank.info['X'] > 0)):
+                    print("ZIGZAG\n\n\n")
+                    zigzag(tank, tank.server)
             else:
                 print("not killed someone")
                 if snitch_appeared:

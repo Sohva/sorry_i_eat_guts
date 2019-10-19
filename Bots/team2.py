@@ -129,7 +129,6 @@ if __name__ == "__main__":
 								                                    closest_enemy[0],
 								                                    closest_enemy[1],
 								                                    tank.server)
-
 								tank.server.sendMessage(ServerMessageTypes.FIRE)
 
 					# get ammo
