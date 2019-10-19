@@ -229,3 +229,9 @@ def findClosestEnemy(tanks, location, our_team):
 				closest_distance = distance
 				closest_location = (tank['X'],tank['Y'])
 	return closest_location
+
+def moveRandomely(server):
+	logging.info("Turning randomly")
+	server.sendMessage(ServerMessageTypes.TURNTOHEADING, {'Amount': random.randint(0, 359)})
+	logging.info("Moving randomly")
+	server.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {'Amount': random.randint(0, 10)})
