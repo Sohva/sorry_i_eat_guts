@@ -10,7 +10,8 @@ import logging
 
 class ThreadingTank(threading.Thread):
 
-    def __init__(self, name, port=8052, hostname='127.0.0.1', danger_health=4):
+    def __init__(self, name, port=8052, hostname='127.0.0.1', danger_health=4,
+                 zigzagging = False):
         threading.Thread.__init__(self)
         self.ids_to_messages = {}
         self.items_to_ids = {
@@ -30,6 +31,7 @@ class ThreadingTank(threading.Thread):
         self.isSeeker = False
         self.hasSnitch = False
         self.danger_health = danger_health
+        self.zigzagging = zigzagging
         logging.info("Creating tank with name '{}'".format(name))
 
     """
@@ -100,6 +102,10 @@ if __name__ == "__main__":
             if tank.nb_kills_to_bank > 0:
                 print("killed someone")
                 goToGoal(tank.location[0], tank.location[1], tank.server)
+                if not tank.zigzagging and -50 < tank.info['Y'] < 50 and\
+                    60 < tank.info['Heading'] < 120 or 240 < tank.info['Heading'] < 300:
+                    print("ZIGZAG")
+                    zigzag(tank, tank.server)
             else:
                 print("not killed someone")
 
@@ -146,6 +152,10 @@ if __name__ == "__main__":
                         else:
                             print("no ammo on map :((")
                             turnRandomly(tank.server)
+
+            print("ZIGZAGGING")
+            print(tank.zigzagging)
+            print("\n\n")
 
 
 

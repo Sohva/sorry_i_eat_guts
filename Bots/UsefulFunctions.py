@@ -314,27 +314,32 @@ def shoot_with_predictive_aiming(tank, target, server):
 
 
 def zigzag(tank, server):
-	for i in range(0,3000):
-		print()
-		print(i)
-		print()
-		heading = float(tank['Heading'])
-		if i == 0:
-			print("TURNING\n\n")
-			server.sendMessage(ServerMessageTypes.TURNTOHEADING,
-			                   {'Amount': heading + 30})
-		elif i == 1000:
-			print("TURNING\n\n")
-			server.sendMessage(ServerMessageTypes.TURNTOHEADING,
-			                   {'Amount': heading - 60})
-		elif i == 2000:
-			print("TURNING\n\n")
-			server.sendMessage(ServerMessageTypes.TURNTOHEADING,
-			                   {'Amount': heading + 60})
-		elif i == 2999:
-			print("TURNING\n\n")
-			server.sendMessage(ServerMessageTypes.TURNTOHEADING,
-			                   {'Amount': heading - 30})
+	heading = float(tank.info['Heading'])
+
+	start_time = dt.datetime.now()
+
+	tank.zigzagging = True
+	print("|ZOOP|")
+	print("TURNING")
+	server.sendMessage(ServerMessageTypes.TURNTOHEADING,
+	                   {'Amount': heading + 30})
+	while (dt.datetime.now() - start_time).seconds < 2:
+		pass
+	print("TURNING")
+	server.sendMessage(ServerMessageTypes.TURNTOHEADING,
+		                   {'Amount': heading - 60})
+	while (dt.datetime.now() - start_time).seconds < 3:
+		pass
+	print("TURNING")
+	server.sendMessage(ServerMessageTypes.TURNTOHEADING,
+		                   {'Amount': heading + 60})
+	while (dt.datetime.now() - start_time).seconds < 4:
+		pass
+	print("TURNING")
+	server.sendMessage(ServerMessageTypes.TURNTOHEADING,
+	                   {'Amount': heading - 30})
+	tank.zigzagging = False
+
 
 def shoot(server):
 	server.sendMessage(ServerMessageTypes.FIRE)
