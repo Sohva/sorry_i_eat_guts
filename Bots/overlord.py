@@ -57,7 +57,7 @@ class ThreadingTank(threading.Thread):
         if message["messageType"] == 25:
             global snitch_appeared
             snitch_appeared = True
-        if (message["messageType"] == 21) && (message["Id"] == self.id):
+        if (message["messageType"] == 21) and (message["Id"] == self.id):
             self.hasSnitch = True
 
 
@@ -102,7 +102,7 @@ if __name__ == "__main__":
 
                 if snitch_appeared:
                     print("snitch appeared")
-                    if thereIsASeeker(tanks):
+                    if seekerExists(tanks):
                         pass
                     else:
                         tank.isSeeker = True
