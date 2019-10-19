@@ -8,7 +8,9 @@ import struct
 import argparse
 import random
 import math
-import datetime
+from datetime import datetime
+from datetime import date
+import time
 
 
 class ServerMessageTypes(object):
@@ -193,7 +195,6 @@ def moveToPoint(x_tank, y_tank, x_target, y_target):
 GameServer = ServerComms(args.hostname, args.port)
 
 # Spawn our tank
-
 myName = "TeamB:SBot"
 myXCoord = 0
 myYCoord = 0
@@ -202,6 +203,9 @@ lastTurnTime = None
 logging.info("Creating tank with name '{}'".format("TeamB:SBot"))
 GameServer.sendMessage(ServerMessageTypes.CREATETANK, {'Name': myName})
 
+print("today seconds is ", time.time())
+
+lastTurnTime = time.time()
 # Main loop
 while True:
 	message = GameServer.readMessage()
@@ -227,13 +231,15 @@ while True:
 
 	if message['Name'] == "ManualTank":
 		logging.info("Found target")
-		if datetime.datetime.now() - lastTurnTime < 1:
+		now = time.time()
+		print("now minus lastTurnTime seconds is ", now - lastTurnTime)
+		if now - lastTurnTime > 1:
 			turnTurretToFaceTarget(myXCoord, myYCoord, message["X"], message["Y"])
-			lastTurnTime = datetime.datetime.now()
+			lastTurnTime = time.time()
 
 		moveToPoint(myXCoord, myYCoord, message["X"], message["Y"])
 		logging.info("Firing")
-		#GameServer.sendMessage(ServerMessageTypes.FIRE)
+		GameServer.sendMessage(ServerMessageTypes.FIRE)
 
 
 
