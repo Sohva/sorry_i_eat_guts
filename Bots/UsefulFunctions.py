@@ -245,17 +245,15 @@ def findClosestEnemy(our_tanks, location, our_team):
 					closest_location = (object['X'],object['Y'])
 	return closest_location
 
-
 def getShotHeading(tank, target):
-
-	time_interval = 0.1
+	time_interval = 0.01
 	tank_pos = (0,0)
 	target_pos = (0,0)
-	tank_v = getVelocity(tank, (tank['X'], tank['Y']), time_interval)
+	#tank_v = getVelocity(tank, (tank['X'], tank['Y']), time_interval)
 	target_v = getVelocity(target, (target['X'], target['Y']), time_interval)
 
-	y_diff = (target_pos[1] + target_v[1] * time_interval) - (tank_pos[1] + target[1] * time_interval)
-	x_diff = (target_pos[0] + target_v[0] * time_interval) - (tank_pos[0] + target[0] * time_interval)
+	y_diff = (target_pos[1] + target_v[1] * time_interval) - tank_pos[1]
+	x_diff = (target_pos[0] + target_v[0] * time_interval) - tank_pos[0]
 
 	shot_heading = math.atan2(y_diff, x_diff)
 
