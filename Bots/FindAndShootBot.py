@@ -214,6 +214,13 @@ def moveToPoint(x_tank, y_tank, x_target, y_target):
 	GameServer.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {'Amount': distance})
 
 
+def goToGoal(x_tank, y_tank):
+	if y >=0:
+		moveToPoint(x_tank, y_tank, 100, 0)
+	else:
+		moveToPoint(x_tank, y_tank, -100, 0)
+
+
 # Connect to game server
 GameServer = ServerComms(args.hostname, args.port)
 
@@ -256,6 +263,8 @@ while True:
 		moveToPoint(myXCoord, myYCoord, message["X"], message["Y"])
 		logging.info("Firing")
 		GameServer.sendMessage(ServerMessageTypes.FIRE)
+
+	#goToGoal(message['X'],message['Y'])
 
 
 
