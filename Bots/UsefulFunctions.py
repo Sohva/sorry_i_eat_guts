@@ -212,6 +212,7 @@ def turnTankToFaceTarget(x_tank, y_tank, x_target, y_target, server):
 def moveToPoint(x_tank, y_tank, x_target, y_target, server):
 	turnTankToFaceTarget(x_tank, y_tank, x_target, y_target, server)
 	distance = math.sqrt(math.pow(x_target - x_tank, 2) + math.pow(y_target - y_tank, 2))
+	print("distance is ", distance)
 	server.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {'Amount': distance})
 
 def goToGoal(x_tank, y_tank, server):

@@ -115,6 +115,7 @@ if __name__ == "__main__":
                         if not closest_enemy:
                             print("no closest enemy")
                             # moveRandomly(tank.server)
+                            continue
                             pass
                         elif distanceTo(tank.location, closest_enemy) < shoot_range:
                             print("closest enemy in range")
