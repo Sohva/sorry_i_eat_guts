@@ -351,9 +351,24 @@ def zigzag(tank, server):
 def shoot(server):
 	server.sendMessage(ServerMessageTypes.FIRE)
 
+def setSeeker(tanks):
+	dictOfThings = tanks[0].dictOfThings
+	snitch_location = None
+
+	for object in dictOfThings:
+		if object["Name"] == "Snitch":
+			snitch_location = (object["X"], object["Y"])
+
+	if not snitch_location:
+		return tanks[0]
+
+	for tank in tanks:
+		our_location = tank.location
+
+
 def closestToSnitch(objects, tank):
 	snitch_pos = None
-	for object in objects.ids_to_messages.values():
+	for object in objects.dictOfThings.messages.values():
 		if object['Name'] == "Snitch":
 			snitch_pos = (object['X'], object['Y'])
 

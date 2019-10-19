@@ -165,8 +165,8 @@ if __name__ == "__main__":
                     if seekerExists(tanks):
                         pass
                     else: #there is no seeker
-                        if closestToSnitch(tanks, tank):
-                            tank.isSeeker = True
+                        setSeeker(tanks)
+                        if tank.isSeeker:
                             continue
                 if tank.info.get("Health", 1000) <= tank.danger_health:
                     print("low health :(")
