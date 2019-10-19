@@ -17,7 +17,7 @@ class ThreadingTank(threading.Thread):
             "Tank": [],
             "HealthPickup": [],
             "AmmoPickup": [],
-            "SnitchPickup": []
+            "Snitch": []
         }
         self.status = {}
         self.server = ServerComms(hostname, port)

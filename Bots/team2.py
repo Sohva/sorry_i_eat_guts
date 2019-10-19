@@ -78,7 +78,7 @@ if __name__ == "__main__":
 	logging.basicConfig(format='[%(asctime)s] %(message)s', level=logging.INFO)
 
 	nb_tanks_to_spawn = 4
-	TEAM = "TeamA"
+	TEAM = "TeamB"
 	tanks = []
 	shoot_range = 50
 	# Initialise tanks
@@ -129,6 +129,7 @@ if __name__ == "__main__":
 								                                    closest_enemy[0],
 								                                    closest_enemy[1],
 								                                    tank.server)
+
 								tank.server.sendMessage(ServerMessageTypes.FIRE)
 
 					# get ammo
