@@ -10,7 +10,7 @@ import logging
 
 class ThreadingTank(threading.Thread):
 
-    def __init__(self, name, port=8052, hostname='127.0.0.1'):
+    def __init__(self, name, port=8052, hostname='127.0.0.1', danger_health=4):
         threading.Thread.__init__(self)
         self.ids_to_messages = {}
         self.items_to_ids = {
@@ -29,6 +29,7 @@ class ThreadingTank(threading.Thread):
         self.ammo = 0
         self.isSeeker = False
         self.hasSnitch = False
+        self.danger_health = danger_health
         logging.info("Creating tank with name '{}'".format(name))
 
     """
