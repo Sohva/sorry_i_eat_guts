@@ -220,35 +220,38 @@ def goToGoal(x_tank, y_tank, server):
 		moveToPoint(x_tank, y_tank, 0, -100, server)
 
 def findClosestAmmo(our_tanks, location):
-	closest_distance = math.inf
+	closest_distance = 10000
 	closest_location = None
 	for our_tank in our_tanks:
 		for object in our_tank.ids_to_messages.values():
 			if object["Type"].split(":")[0] == "AmmoPickup":
-				distance = sqrt((location[0] - pickup['X']) ** 2 + (location[1] - pickup['Y']) ** 2)
+				distance = math.sqrt((location[0] - object['X']) ** 2 + (location[1] - object['Y']) ** 2)
 				if distance < closest_distance:
 					closest_distance = distance
-					closest_location = (pickup['X'], pickup['Y'])
+					closest_location = (object['X'], object['Y'])
 	return closest_location
 
 def findClosestEnemy(our_tanks, location, our_team):
-	closest_distance = math.inf
+	closest_distance = 100000
 	closest_location = None
 	for our_tank in our_tanks:
 		for object in our_tank.ids_to_messages.values():
 			if object['Type'] == "Tank" and object["Name"].split(":")[0] != our_team:
-				distance = sqrt((location[0] - object['X'])**2 + (location[1] - object['Y'])**2)
+				distance = math.sqrt((location[0] - object['X'])**2 + (location[1] - object['Y'])**2)
 				if distance < closest_distance:
 					closest_distance = distance
 					closest_location = (object['X'],object['Y'])
 	return closest_location
 
 def predictiveAiming(location, server):
+	return True
 
-	return shotHeading
-
-def moveRandomely(server):
+def moveRandomly(server):
 	logging.info("Turning randomly")
 	server.sendMessage(ServerMessageTypes.TURNTOHEADING, {'Amount': random.randint(0, 359)})
 	logging.info("Moving randomly")
 	server.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {'Amount': random.randint(0, 10)})
+
+def turnRandomly(server):
+	logging.info("Turning randomly")
+	server.sendMessage(ServerMessageTypes.TURNTOHEADING, {'Amount': random.randint(0, 359)})
