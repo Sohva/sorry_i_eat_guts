@@ -260,5 +260,7 @@ while True:
 		logging.info("Firing")
 		GameServer.sendMessage(ServerMessageTypes.FIRE)
 
+	#goToGoal(message['X'],message['Y'])
+
 
 
