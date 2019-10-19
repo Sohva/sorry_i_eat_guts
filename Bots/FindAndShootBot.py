@@ -238,7 +238,6 @@ while True:
 
 	# GameServer.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE, {"Amount": 90})
 	# GameServer.sendMessage(ServerMessageTypes.MOVEBACKWARSDISTANCE, {"Amount": 90})
-	#
 	# GameServer.sendMessage(ServerMessageTypes.TURNTURRETTOHEADING, {"Amount": 90})
 	# GameServer.sendMessage(ServerMessageTypes.TURNTOHEADING, {"Amount": 100})
 	# GameServer.sendMessage(ServerMessageTypes.FIRE)
@@ -259,10 +258,9 @@ while True:
 
 		now = time.time()
 		print("now minus lastTurnTime seconds is ", now - lastTurnTime)
-		if now - lastTurnTime > 1:
+		if now - lastTurnTime > 0.1:
 			turnTurretToFaceTarget(myXCoord, myYCoord, message["X"], message["Y"])
 			lastTurnTime = time.time()
-
 
 		moveToPoint(myXCoord, myYCoord, message["X"], message["Y"])
 		logging.info("Firing")
