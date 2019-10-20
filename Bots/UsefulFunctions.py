@@ -295,6 +295,8 @@ def findClosestEnemy(tank, our_team):
 	location = tank.location
 	for object in tank.dictOfThings.messages.values():
 		if object['Type'] == "Tank" and object["Name"].split(":")[0] != our_team:
+			if object.get("has_snitch", False):
+				return (object['X'], object['Y'], object['Id'])
 			distance = math.sqrt((location[0] - object['X'])**2 + (location[1] - object['Y'])**2)
 			if distance < closest_distance:
 				closest_distance = distance
