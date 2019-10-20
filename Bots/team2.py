@@ -162,7 +162,9 @@ if __name__ == "__main__":
 	logging.basicConfig(format='[%(asctime)s] %(message)s', level=logging.INFO)
 
 	nb_tanks_to_spawn = 4
+
 	TEAM = "EatSlimes"
+
 	tanks = []
 	shoot_range = 50
 	# Initialise tanks
