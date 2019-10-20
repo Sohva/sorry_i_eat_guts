@@ -215,6 +215,9 @@ def friendlyFire(this_tank, tanks, closest_enemy, fire_direction, team):
 	friend_in_way = False
 	danger_angle = 25
 
+	if not this_tank.dictOfThings.messages:
+		return False
+
 	for tank in tanks:
 		for object in tank.dictOfThings.messages.values():
 			if object['Id'] != this_tank.info['Id'] and object['Name'].split(':')[0] == team:
@@ -346,9 +349,9 @@ def seekerExists(our_tanks):
 
 def goToSnitch(tank, server):
 	for object in tank.dictOfThings.messages.values():
-		if object['Name'] == "Snitch":
-			target_distance = math.sqrt((tank['X'] - object['X']) ** 2 + (tank['Y'] - object['Y']) ** 2)
-			turnTankToFaceTarget(tank['X'], tank['Y'], object['X'], object['Y'])
+		if object['Type'] == "Snitch":
+			target_distance = math.sqrt((tank.location[0] - object['X']) ** 2 + (tank.location[1] - object['Y']) ** 2)
+			turnTankToFaceTarget(tank.location[0], tank.location[1], object['X'], object['Y'], tank.server)
 			server.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE,
 							   {'Amount': target_distance})
 			return
@@ -403,6 +406,7 @@ def shoot(server):
 	server.sendMessage(ServerMessageTypes.FIRE)
 
 def setSeeker(tanks):
+	print("Setting seeker...")
 	dictOfThings = tanks[0].dictOfThings
 	snitch_location = None
 
@@ -411,6 +415,7 @@ def setSeeker(tanks):
 			snitch_location = (object["X"], object["Y"])
 
 	if not snitch_location:
+		print("Did not find snitch... :((((")
 		return False
 
 	closest_dist = 100000
@@ -421,6 +426,7 @@ def setSeeker(tanks):
 			closest_dist = distance
 			closest_tank = tank
 	closest_tank.isSeeker = True
+	print("Chose seeker!!!")
 	return True
 
 
