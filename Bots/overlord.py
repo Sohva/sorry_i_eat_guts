@@ -91,6 +91,8 @@ class ThreadingTank(threading.Thread):
     # logging.info("Attempted to " + ServerMessageTypes.toString(newMessage))
 
     def getItems(self, message):
+        global snitch_appeared
+
         if message["messageType"] == 18: #an item in view
             self.dictOfThings.addMessage(message)
             if message["Name"] == self.name:
@@ -106,11 +108,14 @@ class ThreadingTank(threading.Thread):
             self.nb_kills_to_bank = 0
 
         if message["messageType"] == 25: #snitch appeared on pitch
-            global snitch_appeared
             snitch_appeared = True
 
         if (message["messageType"] == 21) and (message["Id"] == self.id): #got the snitch!
             self.hasSnitch = True
+            snitch_appeared = False
+        elif (message["messageType"] == 21):
+            snitch_appeared = False
+
 
         if message["messageType"] == 19: #health pack pick up
             healthPack = findClosestHealth(self)
@@ -140,7 +145,7 @@ if __name__ == "__main__":
     logging.basicConfig(format='[%(asctime)s] %(message)s', level=logging.INFO)
 
     nb_tanks_to_spawn = 4
-    TEAM = "TeamA"
+    TEAM = "EatGuts"
     tanks = []
     shoot_range = 50
     # Initialise tanks
@@ -155,10 +160,12 @@ if __name__ == "__main__":
         for tank in tanks:
             time.sleep(0.05)
             if tank.hasSnitch:
+                print("have snitch, going to goal")
                 goToGoal(tank.location[0], tank.location[1], tank.server)
                 continue
             elif tank.isSeeker:
-                goToSnitch(tanks, tank.server)
+                print("am seeker, going to snitch")
+                goToSnitch(tank, tank.server)
                 continue
             if tank.nb_kills_to_bank > 0:
                 print("killed someone")
@@ -176,8 +183,9 @@ if __name__ == "__main__":
                     if seekerExists(tanks):
                         pass
                     else: #there is no seeker
-                        if closestToSnitch(tanks, tank):
-                            tank.isSeeker = True
+                        setSeeker(tanks)
+                        print("seeker has been set hopefully")
+                        if tank.isSeeker:
                             continue
                 if tank.info.get("Health", 1000) <= tank.danger_health:
                     print("low health :(")
@@ -193,7 +201,6 @@ if __name__ == "__main__":
                         print("no health on map :((")
                         turnRandomly(tank.server)
                 else:
-                    print("snitch not appeared")
                     if tank.ammo > 0:
                         print("have ammo")
                         closest_enemy = findClosestEnemy(tank, TEAM)
