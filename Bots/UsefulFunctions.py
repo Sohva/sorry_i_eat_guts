@@ -213,7 +213,7 @@ def turnTankToFaceTarget(x_tank, y_tank, x_target, y_target, server):
 
 def friendlyFire(this_tank, tanks, closest_enemy, fire_direction, team):
 	friend_in_way = False
-	danger_angle = 25
+	danger_angle = 5
 
 	if not this_tank.dictOfThings.messages:
 		return False

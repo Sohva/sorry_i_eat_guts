@@ -59,7 +59,7 @@ class MessageDigest:
 
 class ThreadingTank(threading.Thread):
 
-    def __init__(self, name, dictOfThings, port=8052, hostname='127.0.0.1', danger_health=1,
+    def __init__(self, name, dictOfThings, port=8052, hostname='192.168.44.109', danger_health=1,
                  zigzagging = False):
 
         threading.Thread.__init__(self)
