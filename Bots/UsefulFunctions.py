@@ -299,14 +299,16 @@ def seekerExists(our_tanks):
 			return True
 	return False
 
-def goToSnitch(our_tanks, server):
-	for tank in our_tanks:
-		for object in tank.ids_to_messages.values():
-			if object['Name'] == "Snitch":
-				target_distance = math.sqrt((tank['X'] - object['X']) ** 2 + (tank['Y'] - object['Y']) ** 2)
-				turnTankToFaceTarget(tank['X'], tank['Y'], object['X'], object['Y'])
-				server.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE,
-				                   {'Amount': target_distance})
+def goToSnitch(tank, server):
+	for object in tank.dictOfThings.messages.values():
+		if object['Name'] == "Snitch":
+			target_distance = math.sqrt((tank['X'] - object['X']) ** 2 + (tank['Y'] - object['Y']) ** 2)
+			turnTankToFaceTarget(tank['X'], tank['Y'], object['X'], object['Y'])
+			server.sendMessage(ServerMessageTypes.MOVEFORWARDDISTANCE,
+							   {'Amount': target_distance})
+			return
+	print("snitch not found")
+	tank.isSeeker = False
 
 def turnRandomly(server):
 	logging.info("Turning randomly")
@@ -359,15 +361,23 @@ def setSeeker(tanks):
 	dictOfThings = tanks[0].dictOfThings
 	snitch_location = None
 
-	for object in dictOfThings:
-		if object["Name"] == "Snitch":
+	for object in dictOfThings.messages.values():
+		if object["Type"] == "Snitch":
 			snitch_location = (object["X"], object["Y"])
 
 	if not snitch_location:
-		return tanks[0]
+		return False
 
+	closest_dist = 100000
+	closest_tank = tanks[0]
 	for tank in tanks:
-		our_location = tank.location
+		distance = math.sqrt((tank.info['X'] - snitch_location[0]) ** 2 + (tank.info['Y'] - snitch_location[1]) ** 2)
+		if distance < closest_dist:
+			closest_dist = distance
+			closest_tank = tank
+	closest_tank.isSeeker = True
+	return True
+
 
 
 def closestToSnitch(objects, tank):
