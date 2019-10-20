@@ -211,6 +211,47 @@ def turnTankToFaceTarget(x_tank, y_tank, x_target, y_target, server):
 
 	return turn_angle
 
+def friendlyFire(this_tank, tanks, closest_enemy, fire_direction, team):
+	friend_in_way = False
+	danger_angle = 25
+
+	for tank in tanks:
+		for object in tank.dictOfThings.messages.values():
+			if object['Id'] != this_tank.info['Id'] and object['Name'].split(':')[0] == team:
+				x_diff = object['X'] - tank.info['X']
+				y_diff = object['Y'] - tank.info['Y']
+
+				if x_diff >= 0:
+					if y_diff >= 0:
+						friend_angle = 360 - (math.atan2(y_diff, x_diff) * 360 / (2 * math.pi))
+					else:
+						friend_angle = -math.atan2(y_diff, x_diff) * 360 / (2 * math.pi)
+				else:
+					if y_diff >= 0:
+						friend_angle = 360 - (math.atan2(y_diff, x_diff) * 360 / (2 * math.pi))
+					else:
+						friend_angle = -math.atan2(y_diff, x_diff) * 360 / (2 * math.pi)
+
+				if abs(friend_angle - fire_direction) < danger_angle:
+					if math.sqrt(x_diff**2 + y_diff**2) <= math.sqrt((tank.info['X'] - closest_enemy[0])**2 +
+					                                                 (tank.info['Y'] - closest_enemy[1])**2):
+						friend_in_way = True
+
+	return friend_in_way
+
+def maintainDistance(tank, server):
+	too_close_angle = 10
+	too_close_distance = 10
+	adjustment_angle = 10
+	for object in tank.dictOfThings.messages.values():
+		if object['Id'] != tank.info['Id'] and object['Type'] == "Tank" and\
+			abs(tank.info['Heading'] - object['Heading']) < too_close_angle and\
+			math.sqrt((tank.info['X'] - object['X'])**2 + (tank.info['Y'] - object['Y'])**2) < too_close_distance:
+				if tank.info['Heading'] >= object['Heading']:
+					server.sendMessage(ServerMessageTypes.TURNTOHEADING, {'Amount': tank.info['Heading'] - adjustment_angle})
+				else:
+					server.sendMessage(ServerMessageTypes.TURNTOHEADING, {'Amount': tank.info['Heading'] + adjustment_angle})
+				zigzag(tank, server)
 
 def moveToPoint(x_tank, y_tank, x_target, y_target, server):
 	turnTankToFaceTarget(x_tank, y_tank, x_target, y_target, server)

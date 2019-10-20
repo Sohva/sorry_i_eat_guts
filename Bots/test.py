@@ -18,8 +18,8 @@ class DictOfThings(threading.Thread):
 		self.windowSize = window_size
 
 	def addMessage(self, message):
-		print("all the messages", self.messages)
-		print("adding message", message)
+		#print("all the messages", self.messages)
+		#print("adding message", message)
 		message["msTime"] = msTime()
 
 		self.messages[message["Id"]] = message
@@ -32,7 +32,8 @@ class DictOfThings(threading.Thread):
 		while True:
 			time.sleep(1)
 			print("debedababidebadabo ", self.messages)
-			for object_id in self.messages.keys():
+			keys = list(self.messages.keys())
+			for object_id in keys:
 				if (msTime() - self.messages[object_id]["msTime"]) > 3000:
 					self.deleteMessage(object_id)
 
@@ -145,10 +146,14 @@ if __name__ == "__main__":
 		tanks.append(ThreadingTank(TEAM + ":{}".format(i), globalDictOfThings))
 		tanks[i].start()
 
+	#i=0
 	# Smash them
 	while 5 - 3 + 2 == 4:
+		#i += 1
 		for tank in tanks:
 			time.sleep(0.05)
+			#if i>40:
+			#	maintainDistance(tank, tank.server)
 			if tank.hasSnitch:
 				goToGoal(tank.location[0], tank.location[1], tank.server)
 				continue
@@ -158,13 +163,13 @@ if __name__ == "__main__":
 			if tank.nb_kills_to_bank > 0:
 				print("killed someone")
 				goToGoal(tank.location[0], tank.location[1], tank.server)
-			 if not tank.zigzagging and -70 < tank.info['Y'] < 70 and\
-			    ((60 < tank.info['Heading'] <= 90 or 300 > tank.info['Heading'] >= 270)\
-			    and x >= 0) or \
-			    ((90 < tank.info['Heading'] < 120 or 240 < tank['Heading'] < 270)
-			    and x < 0):
-			    print("ZIGZAG")
-			    zigzag(tank, tank.server)
+				if not tank.zigzagging and -70 < tank.info['Y'] < 70 and \
+						(((60 < tank.info['Heading'] <= 90 or 300 > tank.info['Heading'] >= 270) \
+						  and tank.info['X'] <= 0) or \
+						 ((90 < tank.info['Heading'] < 120 or 240 < tank.info['Heading'] < 270)
+						  and tank.info['X'] > 0)):
+					print("ZIGZAG\n\n\n")
+					zigzag(tank, tank.server)
 			else:
 				print("not killed someone")
 				if snitch_appeared:
@@ -202,13 +207,13 @@ if __name__ == "__main__":
 							            closest_enemy[0],
 							            closest_enemy[1],
 							            tank.server)
-							if distanceTo(tank.location, closest_enemy) < shoot_range:
+							fire_direction = turnTurretToFaceTarget(tank.location[0],
+							                                        tank.location[1],
+							                                        closest_enemy[0],
+							                                        closest_enemy[1],
+							                                        tank.server)
+							if distanceTo(tank.location, closest_enemy) < shoot_range and not friendlyFire(tank, tanks, closest_enemy, fire_direction, TEAM):
 								print("shooting now")
-								turnTurretToFaceTarget(tank.location[0],
-								                       tank.location[1],
-								                       closest_enemy[0],
-								                       closest_enemy[1],
-								                       tank.server)
 								tank.server.sendMessage(ServerMessageTypes.FIRE)
 
 					# get ammo

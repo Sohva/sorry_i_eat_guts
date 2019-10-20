@@ -168,7 +168,6 @@ if __name__ == "__main__":
                     and tank.info['X'] <= 0) or \
                     ((90 < tank.info['Heading'] < 120 or 240 < tank.info['Heading'] < 270)
                     and tank.info['X'] > 0)):
-                    print("ZIGZAG\n\n\n")
                     zigzag(tank, tank.server)
             else:
                 print("not killed someone")
@@ -207,15 +206,17 @@ if __name__ == "__main__":
                                         closest_enemy[0],
                                         closest_enemy[1],
                                         tank.server)
-                            if distanceTo(tank.location, closest_enemy) < shoot_range:
+                            fire_direction = turnTurretToFaceTarget(tank.location[0],
+                                                                    tank.location[1],
+                                                                    closest_enemy[0],
+                                                                    closest_enemy[1],
+                                                                    tank.server)
+                            if distanceTo(tank.location, closest_enemy) < shoot_range and not friendlyFire(tank, tanks,
+                                                                                                           closest_enemy,
+                                                                                                           fire_direction,
+                                                                                                           TEAM):
                                 print("shooting now")
-                                fire_direction = turnTurretToFaceTarget(tank.location[0],
-                                                                        tank.location[1],
-                                                                        closest_enemy[0],
-                                                                        closest_enemy[1],
-                                                                        tank.server)
-                                if abs(fire_direction - tank.info['Heading']) < 2:
-                                    tank.server.sendMessage(ServerMessageTypes.FIRE)
+                                tank.server.sendMessage(ServerMessageTypes.FIRE)
                                 
 #get ammo
                     else:
