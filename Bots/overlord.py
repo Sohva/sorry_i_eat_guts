@@ -28,15 +28,16 @@ class DictOfThings(threading.Thread):
         print("deleting message with id ", id)
 
     def run(self):
+        global snitch_available
         while True:
             time.sleep(1)
-            print("debedababidebadabo ",self.messages)
+            print("debedababidebadabo all messages in dict of things ",self.messages)
             keys = list(self.messages.keys())
             for object_id in keys:
+                if self.messages[object_id]["Type"] == "Snitch":
+                    snitch_available = True
                 if (msTime() - self.messages[object_id]["msTime"]) > 3000:
                     self.deleteMessage(object_id)
-
-
 
 
 class MessageDigest:
@@ -57,7 +58,6 @@ class MessageDigest:
 
 
 class ThreadingTank(threading.Thread):
-
 
     def __init__(self, name, dictOfThings, port=8052, hostname='127.0.0.1', danger_health=1,
                  zigzagging = False):
@@ -92,7 +92,7 @@ class ThreadingTank(threading.Thread):
     # logging.info("Attempted to " + ServerMessageTypes.toString(newMessage))
 
     def getItems(self, message):
-        global snitch_appeared
+        global snitch_available
 
         if message["messageType"] == 18: #an item in view
             self.dictOfThings.addMessage(message)
@@ -112,13 +112,17 @@ class ThreadingTank(threading.Thread):
                 self.hasSnitch = False
 
         if message["messageType"] == 25: #snitch appeared on pitch
-            snitch_appeared = True
+            snitch_available = True
 
         if (message["messageType"] == 21) and (message["Id"] == self.id): #got the snitch!
             self.hasSnitch = True
-            snitch_appeared = False
-        elif (message["messageType"] == 21):
-            snitch_appeared = False
+            snitch_available = False
+            
+        elif (message["messageType"] == 21): #some other tank got the snitch
+            snitch_available = False
+            if self.dictOfThings.messages[message["Id"]]:
+                self.dictOfThings.messages[message["Id"]]["has_snitch"] = True
+
 
 
         if message["messageType"] == 19: #health pack pick up
@@ -143,7 +147,7 @@ class ThreadingTank(threading.Thread):
         return
 
 
-snitch_appeared = False
+snitch_available = False
 
 random_targets = [
     [-50, -50],
@@ -153,9 +157,10 @@ random_targets = [
 ]
 
 def moveToRandomCircleBit(tank):
-    choice = random.randint(0,3)
+    choice = random.randint(0, 3)
 
     target = random_targets[choice]
+    
     if (msTime() - tank.lastUpdate >= 500) :
         moveToPoint(tank.location[0], tank.location[1], target[0], target[1], tank.server)
         tank.lastUpdate = msTime()
@@ -198,7 +203,7 @@ if __name__ == "__main__":
                     zigzag(tank, tank.server)
             else:
                 print("not killed someone")
-                if snitch_appeared:
+                if snitch_available:
                     print("snitch appeared")
                     if seekerExists(tanks):
                         pass
