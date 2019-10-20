@@ -17,8 +17,8 @@ class DictOfThings(threading.Thread):
         self.windowSize = window_size
 
     def addMessage(self, message):
-        print("all the messages", self.messages)
-        print("adding message", message)
+        #print("all the messages", self.messages)
+        #print("adding message", message)
         message["msTime"] = msTime()
 
         self.messages[message["Id"]] = message
@@ -200,7 +200,7 @@ if __name__ == "__main__":
                     and tank.info['X'] <= 0) or \
                     ((90 < tank.info['Heading'] < 120 or 240 < tank.info['Heading'] < 270)
                     and tank.info['X'] > 0)):
-                    zigzag(tank, tank.server)
+                    threading.Thread(target=zigzag, args=(tank, tank.server)).start()
             else:
                 print("not killed someone")
                 if snitch_available:
@@ -264,6 +264,7 @@ if __name__ == "__main__":
                         else:
                             print("no ammo on map :((")
                             moveToRandomCircleBit(tank)
+
 
 
 
