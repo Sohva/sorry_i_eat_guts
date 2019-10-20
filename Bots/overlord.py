@@ -195,7 +195,7 @@ if __name__ == "__main__":
                     and tank.info['X'] <= 0) or \
                     ((90 < tank.info['Heading'] < 120 or 240 < tank.info['Heading'] < 270)
                     and tank.info['X'] > 0)):
-                    zigzag(tank, tank.server)
+                    threading.Thread(target=zigzag, args=(tank, tank.server)).start()
             else:
                 print("not killed someone")
                 if snitch_appeared:
