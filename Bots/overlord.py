@@ -17,8 +17,8 @@ class DictOfThings(threading.Thread):
         self.windowSize = window_size
 
     def addMessage(self, message):
-        print("all the messages", self.messages)
-        print("adding message", message)
+        #print("all the messages", self.messages)
+        #print("adding message", message)
         message["msTime"] = msTime()
 
         self.messages[message["Id"]] = message
@@ -31,7 +31,7 @@ class DictOfThings(threading.Thread):
         while True:
             time.sleep(1)
             print("debedababidebadabo ",self.messages)
-            keys = self.messages.keys().copy()
+            keys = list(self.messages.keys())
             for object_id in keys:
                 if (msTime() - self.messages[object_id]["msTime"]) > 3000:
                     self.deleteMessage(object_id)
@@ -198,7 +198,6 @@ if __name__ == "__main__":
                         print("have ammo")
                         closest_enemy = findClosestEnemy(tank, TEAM)
                         if not closest_enemy:
-                            print("no closest enemy")
                             turnRandomly(tank.server)
                         else:
                             moveToPoint(tank.location[0],
@@ -232,6 +231,7 @@ if __name__ == "__main__":
                         else:
                             print("no ammo on map :((")
                             turnRandomly(tank.server)
+
 
 
 
