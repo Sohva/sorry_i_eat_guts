@@ -78,6 +78,7 @@ class ThreadingTank(threading.Thread):
         self.hasSnitch = False
         self.danger_health = danger_health
         self.zigzagging = zigzagging
+        self.lastUpdate = msTime()
 
         logging.info("Creating tank with name '{}'".format(name))
 
@@ -106,6 +107,9 @@ class ThreadingTank(threading.Thread):
 
         if message["messageType"] == 23: #got to goal
             self.nb_kills_to_bank = 0
+            if self.hasSnitch: #caught snitch and banked
+                self.isSeeker = False
+                self.hasSnitch = False
 
         if message["messageType"] == 25: #snitch appeared on pitch
             snitch_appeared = True
@@ -140,6 +144,22 @@ class ThreadingTank(threading.Thread):
 
 
 snitch_appeared = False
+
+random_targets = [
+    [-50, -50],
+    [-50, 50],
+    [50, -50],
+    [50, 50]
+]
+
+def moveToRandomCircleBit(tank):
+    choice = random.randint(0,3)
+
+    target = random_targets[choice]
+    if (msTime() - tank.lastUpdate >= 500) :
+        moveToPoint(tank.location[0], tank.location[1], target[0], target[1], tank.server)
+        tank.lastUpdate = msTime()
+    return
 
 if __name__ == "__main__":
     logging.basicConfig(format='[%(asctime)s] %(message)s', level=logging.INFO)
@@ -199,14 +219,14 @@ if __name__ == "__main__":
                                     tank.server)
                     else:
                         print("no health on map :((")
-                        turnRandomly(tank.server)
+                        moveToRandomCircleBit(tank)
                 else:
                     if tank.ammo > 0:
                         print("have ammo")
                         closest_enemy = findClosestEnemy(tank, TEAM)
                         if not closest_enemy:
                             print("no closest enemy")
-                            turnRandomly(tank.server)
+                            moveToRandomCircleBit(tank)
                         else:
                             moveToPoint(tank.location[0],
                                         tank.location[1],
@@ -238,7 +258,7 @@ if __name__ == "__main__":
                                         tank.server)
                         else:
                             print("no ammo on map :((")
-                            turnRandomly(tank.server)
+                            moveToRandomCircleBit(tank)
 
 
 
