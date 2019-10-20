@@ -209,12 +209,13 @@ if __name__ == "__main__":
                                         tank.server)
                             if distanceTo(tank.location, closest_enemy) < shoot_range:
                                 print("shooting now")
-                                turnTurretToFaceTarget(tank.location[0],
-                                                   tank.location[1],
-                                                   closest_enemy[0],
-                                                   closest_enemy[1],
-                                                   tank.server)
-                                tank.server.sendMessage(ServerMessageTypes.FIRE)
+                                fire_direction = turnTurretToFaceTarget(tank.location[0],
+                                                                        tank.location[1],
+                                                                        closest_enemy[0],
+                                                                        closest_enemy[1],
+                                                                        tank.server)
+                                if abs(fire_direction - tank.info['Heading']) < 2:
+                                    tank.server.sendMessage(ServerMessageTypes.FIRE)
                                 
 #get ammo
                     else:

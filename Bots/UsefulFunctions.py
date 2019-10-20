@@ -209,6 +209,8 @@ def turnTankToFaceTarget(x_tank, y_tank, x_target, y_target, server):
 	print(turn_angle)
 	server.sendMessage(ServerMessageTypes.TURNTOHEADING, {"Amount": turn_angle})
 
+	return turn_angle
+
 
 def moveToPoint(x_tank, y_tank, x_target, y_target, server):
 	turnTankToFaceTarget(x_tank, y_tank, x_target, y_target, server)
